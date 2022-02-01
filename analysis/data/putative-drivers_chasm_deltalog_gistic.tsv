@@ -1,0 +1,142 @@
+gene	dataset
+ATM	chasm
+KMT2A	chasm
+CHD8	chasm
+TP53BP1	chasm
+CREBBP	chasm
+MSH6	chasm
+EP300	chasm
+APC	chasm
+NSD1	chasm
+KDM6A	chasm
+LZTR1	chasm
+NOTCH1	chasm
+USP9X	chasm
+KRAS	chasm
+SPOP	chasm
+PBRM1	chasm
+FGFR2	chasm
+RB1	chasm
+CHD3	chasm
+RUNX1	chasm
+ARID1A	chasm
+KLF5	chasm
+ERBB2	chasm, gistic, delta_log
+CIC	chasm
+CASP8	chasm
+NF2	chasm
+SETD2	chasm
+EGFR	chasm, delta_log
+AKT1	chasm
+SIN3A	chasm
+TP53	chasm
+NF1	chasm
+SMARCA4	chasm
+ERCC2	chasm
+MAP3K1	chasm
+LATS1	chasm
+STAG2	chasm
+CTCF	chasm
+MAP2K4	chasm, delta_log
+CDK12	chasm, gistic, delta_log
+NAA15	chasm
+CTNNB1	chasm
+EPHA2	chasm
+RAB14	chasm
+DDX3X	chasm
+AJUBA	chasm
+MLLT1	chasm
+TRAF3	chasm
+MTOR	chasm
+FGFR3	chasm, gistic
+ASPSCR1	gistic
+BUB1B	gistic
+BZW2	gistic, delta_log
+CCNE1	gistic
+CD274	gistic
+CDC73	gistic
+CDKN2A	gistic, delta_log
+CDKN2B	gistic, delta_log
+CHIC2	gistic
+CLTC	gistic
+COX6C	gistic, delta_log
+DCC	gistic, delta_log
+DDR2	gistic
+DGCR8	gistic
+ELF3	gistic
+ELK4	gistic
+ERC1	gistic
+EXT2	gistic
+FANCF	gistic
+FCGR2B	gistic
+FIP1L1	gistic
+HRAS	gistic
+JAK2	gistic
+KDM5A	gistic
+KDR	gistic
+KIT	gistic
+MALAT1	gistic
+MDM4	gistic
+MLLT11	gistic
+MYC	gistic, delta_log
+NTRK1	gistic, delta_log
+NTRK3	gistic
+NUMA1	gistic
+PABPC1	gistic, delta_log
+PDCD1LG2	gistic
+PDGFRA	gistic
+POLD4	gistic
+PTPRC	gistic
+RAD51	gistic
+RAD51B	gistic
+RAD52	gistic
+RFC1	gistic
+RPA3	gistic, delta_log
+RPS6KB2	gistic
+SDHC	gistic, delta_log
+SEPT5	gistic
+SLC45A3	gistic
+SPECC1	gistic
+SRC	gistic
+TBX3	gistic
+TP63	gistic, delta_log
+TPR	gistic
+UBR5	gistic, delta_log
+WWTR1	gistic
+BCL9	delta_log
+THEM4	delta_log
+TPM3	delta_log
+MUC1	delta_log
+LMNA	delta_log
+PRCC	delta_log
+CNTN3	delta_log
+MECOM	delta_log
+BCL6	delta_log
+FAT1	delta_log
+TERT	delta_log
+CTNND2	delta_log
+TRIO	delta_log
+CDH10	delta_log
+DROSHA	delta_log
+IL7R	delta_log
+LIFR	delta_log
+RICTOR	delta_log
+QKI	delta_log
+AFDN	delta_log
+ARHGEF10	delta_log
+NRG1	delta_log
+HEY1	delta_log
+CDH17	delta_log
+RSPO2	delta_log
+EIF3E	delta_log
+CSMD3	delta_log
+RAD21	delta_log
+EXT1	delta_log
+NDRG1	delta_log
+MGMT	delta_log
+ARHGAP5	delta_log
+GRIN2A	delta_log
+GAS7	delta_log
+SMAD2	delta_log
+SMAD4	delta_log
+ISX	delta_log
