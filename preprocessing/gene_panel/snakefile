@@ -1,0 +1,182 @@
+import pandas as pd
+import os, glob
+
+# Specify config file
+configfile: "config.yaml"
+indir = config['indir']
+outdir = config['outdir']
+
+
+# Specify samples
+samples = [os.path.basename(x).split("_R1", 1)[0] for x in glob.glob(indir + "*R1.fastq.gz")]
+
+# Rule specifying output files
+rule all:
+	input:
+		expand(outdir + "called/{sample}_final-annot.vcf", sample = samples)
+
+
+# Trim fastqs
+rule trimFastqs:
+	input:
+		f1=indir + "{sample}_R1.fastq.gz",
+		f2=indir + "{sample}_R2.fastq.gz",
+	output:
+		f1=dynamic(outdir + "fastq-trimmed/{sample}_R1{random}_Cut_0.fastq.gz"),
+		f2=dynamic(outdir + "fastq-trimmed/{sample}_R2{random}_Cut_0.fastq.gz"),
+		rn=dynamic(outdir + "fastq-trimmed/{sample}_RN{random}_MBC_0.txt.gz"),
+		stats=dynamic(outdir + "fastq-trimmed/{sample}_RN{random}_STATS_0.properties")
+	params:
+		out=outdir + "fastq-trimmed/",
+		mem="24G"
+	threads: 10
+	shell:
+		"java -Xmx{params.mem} -jar /home/luukharbers/AGeNT_2.0.5/agent/lib/trimmer-2.0.3.jar "
+		"-fq1 {input.f1} -fq2 {input.f2} -v2 -out_loc {params.out}"
+
+
+rule fixoutput:
+	input:
+		f1=dynamic(outdir + "fastq-trimmed/{sample}_R1{random}_Cut_0.fastq.gz"),
+		f2=dynamic(outdir + "fastq-trimmed/{sample}_R2{random}_Cut_0.fastq.gz"),
+		rn=dynamic(outdir + "fastq-trimmed/{sample}_RN{random}_MBC_0.txt.gz"),
+		stats=dynamic(outdir + "fastq-trimmed/{sample}_RN{random}_STATS_0.properties")
+	output:
+		f1=outdir + "fastq-trimmed/{sample}_R1_Cut_0.fastq.gz",
+		f2=outdir + "fastq-trimmed/{sample}_R2_Cut_0.fastq.gz",
+		rn=outdir + "fastq-trimmed/{sample}_RN_MBC_0.txt.gz",
+		stats=outdir + "fastq-trimmed/{sample}_RN_STATS_0.properties"
+	shell:
+		"""
+		mv {input.f1} {output.f1}
+		mv {input.f2} {output.f2}
+		mv {input.rn} {output.rn}
+		mv {input.stats} {output.stats}
+		"""
+
+# Map using bwa mem
+rule bwamem:
+	input:
+		config['ref'],
+		outdir + "fastq-trimmed/{sample}_R1_Cut_0.fastq.gz",
+		outdir + "fastq-trimmed/{sample}_R2_Cut_0.fastq.gz"
+	output:
+		temp(outdir + "mapped/{sample}.bam")
+	params:
+		rg=r"@RG\tID:{sample}\tSM:{sample}\tPL:ILLUMINA"
+	threads: config['threads']
+	shell:
+		"bwa mem -M -C -t {threads} -R '{params.rg}' {input} | "
+        "samtools view -bS - > {output}"
+
+# Use agilents deduplication
+rule dedup:
+	input:
+		bam=outdir + "mapped/{sample}.bam",
+		rn=outdir + "fastq-trimmed/{sample}_RN_MBC_0.txt.gz",
+		bed=config['bed']
+	output:
+		temp(outdir + "mapped/{sample}_dedup.bam")
+	params:
+		mem="24G"
+	threads: 4
+	shell:
+		"java -Xmx{params.mem} -jar /home/luukharbers/AGeNT_2.0.5/agent/lib/locatit-2.0.5.jar "
+		"-o {output} -v2Duplex -S -IB -OB -l {input.bed} {input.bam} {input.rn}"
+
+# Run base score recalibration
+rule bqsr:
+    input:
+        bam=outdir + "mapped/{sample}_dedup.bam",
+        known="/mnt/AchTeraD/Documents/references/vcf-files/"
+        "dbsnp-b151_GRCh37p13-all.vcf.gz",
+        ref="/mnt/AchTeraD/Documents/references/hg19/hg19.fa"
+    output:
+        protected(outdir + "mapped/{sample}.final.bam")
+    threads: config['threads'] / 2
+    priority: 2
+    shell:
+        "/home/luukharbers/gatk-4.1.8.0/gatk BQSRPipelineSpark -I {input.bam} -O {output} "
+        "-R {input.ref} --known-sites {input.known} "
+        "--conf 'spark.executor.cores={threads}'"
+
+rule mutect2:
+	input:
+		bam=outdir + "mapped/{sample}.final.bam",
+		ref="/mnt/AchTeraD/Documents/references/hg19/hg19.fa",
+		germ="/mnt/AchTeraD/Documents/references/vcf-files/"
+		"af-only-gnomad.raw.sites-b37.vcf.gz",
+		capt=config['bed']
+	output:
+		vcf=outdir + "called/{sample}.vcf.gz",
+		f1r2=outdir + "called/{sample}_f1r2.tar.gz"
+	log:
+		"/mnt/AchTeraD/logs/mutect2_logs/{sample}.log"
+	threads: 4
+	shell:
+		"gatk Mutect2 -I {input.bam} -R {input.ref} -O {output.vcf} "
+		"--f1r2-tar-gz {output.f1r2} --germline-resource {input.germ} "
+		"-L {input.capt}"
+
+#Rule for generating the contamination model
+rule orient_model:
+	input:
+		outdir + "called/{sample}_f1r2.tar.gz"
+	output:
+		temp(outdir + "called/{sample}_read-orientation-model.tar.gz")
+	threads: 4
+	shell:
+		"gatk LearnReadOrientationModel -I {input} -O {output}"
+
+# Pileup Summaries call
+rule pileupsummaries:
+	input:
+		bam=outdir + "mapped/{sample}.final.bam",
+		pileup="/mnt/AchTeraD/Documents/references/vcf-files/"
+		"small_exac_common_3_b37.vcf.gz"
+	output:
+		temp(outdir + "called/{sample}_getpileupsummaries.table")
+	threads: 2
+	shell:
+		"gatk GetPileupSummaries -I {input.bam} -V {input.pileup} "
+		"-L {input.pileup} -O {output}"
+
+# Rule for generating the contamination model
+rule contamination:
+	input:
+		outdir + "called/{sample}_getpileupsummaries.table"
+	output:
+		temp(outdir + "called/{sample}_calculatecontamination.table")
+	threads: 2
+	shell:
+		"gatk CalculateContamination -I {input} -O {output}"
+
+# Rule to filter Mutect2 calls
+rule filtercalls:
+	input:
+		vcf=outdir + "called/{sample}.vcf.gz",
+		ref="/mnt/AchTeraD/Documents/references/hg19/hg19.fa",
+		contam=outdir + "called/{sample}_calculatecontamination.table",
+		orient=outdir + "called/{sample}_read-orientation-model.tar.gz"
+	output:
+		outdir + "called/{sample}_final.vcf.gz"
+	threads: 2
+	shell:
+		"gatk FilterMutectCalls -V {input.vcf} -R {input.ref} "
+		"--contamination-table {input.contam} "
+		"--ob-priors {input.orient} -O {output}"
+
+# Annotate variants
+rule annotate:
+	input:
+		vcf=outdir + "called/{sample}_final.vcf.gz",
+		ref="/mnt/AchTeraD/Documents/references/hg19/hg19.fa",
+		datasource="/home/luukharbers/gatk-4.1.4.1/"
+		"funcotator_dataSources.v1.6.20190124s/"
+	output:
+		outdir + "called/{sample}_final-annot.vcf"
+	threads: 4
+	shell:
+		"gatk Funcotator -R {input.ref} -V {input.vcf} -O {output} "
+		"--output-file-format VCF --data-sources-path {input.datasource} "
+		"--ref-version hg19 --force-b37-to-hg19-reference-contig-conversion"

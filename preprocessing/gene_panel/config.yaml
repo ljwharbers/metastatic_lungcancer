@@ -1,0 +1,6 @@
+indir: "/mnt/AchTeraD/data/ngi/P18754/gene-panel/fastq/"
+outdir: "/mnt/AchTeraD/data/ngi/P18754/gene-panel/"
+
+ref: "/mnt/AchTeraD/Documents/references/hg19/hg19.fa"
+bed: "/mnt/AchTeraD/Documents/Projects/LungCancer/Data/gene-panel/agilent_capture/3240571_Covered_hg19Liftover.bed"
+threads: 40

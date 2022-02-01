@@ -1,0 +1,94 @@
+import glob, os
+
+# Specify config file
+configfile: "config.yaml"
+
+# Specify samples
+samples = glob.glob(config['indir'] + "*.bam")
+samples = [os.path.basename(os.path.splitext(sample)[0]) for sample in samples]
+
+# Rule specifying output files
+rule all:
+	input:
+		expand(config['outdir'] + "{sample}/annot.filtered-{sample}.vcf.gz", 
+			sample = samples)
+
+# Rule for standard snp calling using mutect2
+rule mutect2:
+	input:
+		bam=config['indir'] + "{sample}.bam",
+		ref="/mnt/AchTeraD/Documents/references/hg19/hg19.fa",
+		germ="/mnt/AchTeraD/Documents/references/vcf-files/"
+		"af-only-gnomad.raw.sites-b37.vcf.gz"
+	output:
+		vcf=temp(config['outdir'] + "{sample}/unfiltered-{sample}.vcf.gz"),
+		f1r2=config['outdir'] + "{sample}/f1r2.tar.gz"
+	log:
+		"/mnt/AchTeraD/logs/mutect2_logs/{sample}.log"
+	threads: 2
+	shell:
+		"gatk Mutect2 -I {input.bam} -R {input.ref} -O {output.vcf} " 
+		"--f1r2-tar-gz {output.f1r2} --germline-resource {input.germ}"
+
+# Rule for generating the contamination model
+rule orient_model:
+	input:
+		config['outdir'] + "{sample}/f1r2.tar.gz"
+	output:
+		temp(config['outdir'] + "{sample}/read-orientation-model.tar.gz")
+	threads: 2
+	shell:
+		"gatk LearnReadOrientationModel -I {input} -O {output}"
+
+# Pileup Summaries call
+rule pileupsummaries:
+	input:
+		bam=config['indir'] + "{sample}.bam",
+		pileup="/mnt/AchTeraD/Documents/references/vcf-files/"
+		"small_exac_common_3_b37.vcf.gz"
+	output:
+		temp(config['outdir'] + "{sample}/getpileupsummaries.table")
+	threads: 2
+	shell:
+		"gatk GetPileupSummaries -I {input.bam} -V {input.pileup} "
+		"-L {input.pileup} -O {output}"
+
+# Rule for generating the contamination model
+rule contamination:
+	input:
+		config['outdir'] + "{sample}/getpileupsummaries.table"
+	output:
+		config['outdir'] + "{sample}/calculatecontamination.table"
+	threads: 2
+	shell:
+		"gatk CalculateContamination -I {input} -O {output}"
+
+# Rule to filter Mutect2 calls
+rule filtercalls:
+	input:
+		vcf=config['outdir'] + "{sample}/unfiltered-{sample}.vcf.gz",
+		ref="/mnt/AchTeraD/Documents/references/hg19/hg19.fa",
+		contam=config['outdir'] + "{sample}/calculatecontamination.table",
+		orient=config['outdir'] + "{sample}/read-orientation-model.tar.gz"
+	output:
+		config['outdir'] + "{sample}/filtered-{sample}.vcf.gz"
+	threads: 2
+	shell:
+		"gatk FilterMutectCalls -V {input.vcf} -R {input.ref} "
+		"--contamination-table {input.contam} "
+		"--ob-priors {input.orient} -O {output}"
+
+# Annotate filtered calls
+rule annotate:
+	input:
+		vcf=config['outdir'] + "{sample}/filtered-{sample}.vcf.gz",
+		ref="/mnt/AchTeraD/Documents/references/hg19/hg19.fa",
+		datasource="/home/luukharbers/gatk-4.1.4.1/"
+		"funcotator_dataSources.v1.6.20190124s/"
+	output:
+		config['outdir'] + "{sample}/annot.filtered-{sample}.vcf.gz"
+	threads: 2
+	shell:
+		"gatk Funcotator -R {input.ref} -V {input.vcf} -O {output} "
+		"--output-file-format VCF --data-sources-path {input.datasource} "
+		"--ref-version hg19"

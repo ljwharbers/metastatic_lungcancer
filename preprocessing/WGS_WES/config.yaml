@@ -1,0 +1,5 @@
+indir: "/mnt/sequencing/Lungcancer/WES/BICRO201/fastq/"
+outdir: "/mnt/sequencing/Lungcancer/WES/BICRO201/"
+method: "pe"
+threads: 38
+ref: "/mnt/AchTeraD/Documents/references/hg19/hg19.fa"

@@ -1,0 +1,1803 @@
+---
+title: "Comparative genomic profiling identifies targetable brain metastasis drivers in non-small cell lung cancer"
+author: "Luuk Harbers"
+output: 
+  html_document:
+    df_print: "kable"
+    toc: true
+    toc_depth: 4
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(width = 28)
+```
+
+This file includes all code required to reproduce the plots/figures used in the manuscript 'Comparative genomic profiling identifies targetable brain metastasis drivers in non-small cell lung cancer' 
+
+# Analysis
+
+## Comparison of the two different SCNA callers used
+
+To call SCNAs in shallow WGS we used two different callers, QDNAseq and CNVkit. 
+
+```{r Loading libraries and setting plotting theme, include = FALSE}
+require(data.table)
+require(ggplot2)
+require(cowplot)
+require(scales)
+require(dplyr)
+require(biomaRt)
+require(ggpubr)
+require(ggsci)
+require(RColorBrewer)
+require(ComplexHeatmap)
+require(ggdendro)
+require(karyoploteR)
+require(naturalsort)
+require(GenomicRanges)
+require(viridis)
+require(ggrepel)
+require(MutationalPatterns)
+require(BSgenome.Hsapiens.UCSC.hg19)
+require(GenVisR)
+require(clusterProfiler)
+require(enrichplot)
+require(org.Hs.eg.db)
+require(tidyr)
+theme_set(theme_cowplot())
+```
+
+```{r comparison of copy number callers, include=TRUE, warning=FALSE}
+# Load in QDNAseq and CNVkit data
+caller_files = list.files("./data/combined_callers/", full.names = T)
+
+caller_dataset = lapply(caller_files, function(file) {
+  dt = fread(file, select = c(1:6, 10, 14))
+  setnames(dt, c("chr", "start", "end", "feature", "cnvkit_raw", "cnvkit_seg", "qdnaseq_raw", "qdnaseq_seg"))
+  
+  # Add sample information
+  dt[, sample := gsub(".wgs.*", "", basename(file))]
+  })
+
+# Combine all samples
+caller_dataset = rbindlist(caller_dataset)
+
+# Plot individual samples
+MN14b = caller_dataset[sample == "MN14b",]
+
+# Set CNA colours
+MN14b[qdnaseq_seg > log2(2.5/2), qdnaseq_call := "Amplification"]
+MN14b[qdnaseq_seg < log2(1.5/2), qdnaseq_call := "Deletion"]
+MN14b[is.na(qdnaseq_call), qdnaseq_call := "Neutral"]
+
+MN14b[cnvkit_seg > log2(2.5/2), cnvkit_call := "Amplification"]
+MN14b[cnvkit_seg < log2(1.5/2), cnvkit_call := "Deletion"]
+MN14b[is.na(cnvkit_call), cnvkit_call := "Neutral"]
+
+# Prepare bins
+MN14b[, bin := seq_along(chr)]
+MN14b[, end_cum := cumsum((end - start) + 1)]
+MN14b[, start_cum := c(1, end_cum[1:length(end_cum)-1] + 1)]
+
+# Make chr_bounds
+chr_bounds = MN14b[, list(min = min(bin), max = max(bin), chrlen_bp = sum(end-start)), by = chr]
+chr_bounds = chr_bounds %>% 
+  mutate(mid = round(min + (max-min) / 2,0),
+         end_bp=cumsum(as.numeric(chrlen_bp)), 
+         start_bp = end_bp - chrlen_bp, 
+         mid_bp = round((chrlen_bp / 2) + start_bp, 0))
+
+colors = c(brewer.pal(3, "Set1")[1:2], "#c1c1c1")
+names(colors) = c("Amplification", "Deletion", "Neutral")
+
+# save plot
+plt1 = ggplot(MN14b, aes(x = bin)) +
+  geom_point(aes(y = cnvkit_raw, color = cnvkit_call), size = 0.7) +
+  geom_point(aes(y = cnvkit_seg), size = 1) +
+  scale_color_manual(values = colors, drop = F) +
+  scale_y_continuous(limits = c(-2, 4), labels=comma_format(accuracy = 1), breaks = pretty_breaks(6)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  labs(y = "Log2 ratio", x = "", title = "MN14B CNVkit") +
+  geom_vline(data = chr_bounds, aes(xintercept = max), linetype = 2) +
+  geom_text(data = chr_bounds, aes(x = mid, y = -Inf, label = chr), vjust = -0.5, hjust = "center", inherit.aes = F) +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+plt1
+png("./plots/Suppl_fig1b_MN14b_cnvkit.png", width = 16, height = 8, units = "in", res = 200)
+plt1
+dev.off()
+
+plt2 = ggplot(MN14b, aes(x = bin)) +
+  geom_point(aes(y = qdnaseq_raw, color = qdnaseq_call), size = 0.7) +
+  geom_point(aes(y = qdnaseq_seg), size = 1) +
+  scale_color_manual(values = colors, drop = F) +
+  scale_y_continuous(limits = c(-2, 4), labels=comma_format(accuracy = 1), breaks = pretty_breaks(6)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  labs(y = "Log2 ratio", x = "", title = "MN14B QDNAseq") +
+  geom_vline(data = chr_bounds, aes(xintercept = max), linetype = 2) +
+  geom_text(data = chr_bounds, aes(x = mid, y = -Inf, label = chr), vjust = -0.5, hjust = "center", inherit.aes = F) +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+plt2
+png("./plots/Suppl_fig1b_MN14b_qdnaseq.png", width = 16, height = 8, units = "in", res = 200)
+plt2
+dev.off()
+# Plot Pearson correlation
+correlation = caller_dataset[, cor(cnvkit_seg, qdnaseq_seg), by = sample]
+
+plt3 = ggplot(correlation, aes(x = "", y = V1)) +
+  geom_boxplot() +
+  geom_jitter(width = .25) +
+  labs(y = "PCC", x = "", title = "Pearson correlation between QDNAseq and CNVkit") +
+  theme(axis.ticks.x = element_blank())
+
+plt3
+png("./plots/Suppl_fig1c_cnvkit_qdnaseq_pcc.png", width = 6, height = 8, units = "in", res = 200)
+plt3
+dev.off()
+
+# Plot MN18 NSCLC and BM
+MN18 = caller_dataset[sample == "MN18",]
+MN18b = caller_dataset[sample == "MN18b",]
+
+# Set CNA colours
+MN18[qdnaseq_seg > log2(2.5/2), qdnaseq_call := "Amplification"]
+MN18[qdnaseq_seg < log2(1.5/2), qdnaseq_call := "Deletion"]
+MN18[is.na(qdnaseq_call), qdnaseq_call := "Neutral"]
+
+MN18b[qdnaseq_seg > log2(2.5/2), qdnaseq_call := "Amplification"]
+MN18b[qdnaseq_seg < log2(1.5/2), qdnaseq_call := "Deletion"]
+MN18b[is.na(qdnaseq_call), qdnaseq_call := "Neutral"]
+
+# Prepare bins
+MN18[, bin := seq_along(chr)]
+MN18[, end_cum := cumsum((end - start) + 1)]
+MN18[, start_cum := c(1, end_cum[1:length(end_cum)-1] + 1)]
+
+MN18b[, bin := seq_along(chr)]
+MN18b[, end_cum := cumsum((end - start) + 1)]
+MN18b[, start_cum := c(1, end_cum[1:length(end_cum)-1] + 1)]
+
+# save plot
+plt4 = ggplot(MN18, aes(x = bin)) +
+  geom_point(aes(y = qdnaseq_raw, color = qdnaseq_call), size = 0.7) +
+  geom_point(aes(y = qdnaseq_seg), size = 1) +
+  scale_color_manual(values = colors, drop = F) +
+  scale_y_continuous(limits = c(-2, 4), labels=comma_format(accuracy = 1), breaks = pretty_breaks(6)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  labs(y = "Log2 ratio", x = "", title = "MN18") +
+  geom_vline(data = chr_bounds, aes(xintercept = max), linetype = 2) +
+  geom_text(data = chr_bounds, aes(x = mid, y = -Inf, label = chr), vjust = -0.5, hjust = "center", inherit.aes = F) +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+plt4
+png("./plots/fig1b_MN18_NSCLC.png", width = 16, height = 8, units = "in", res = 200)
+plt4
+dev.off()
+
+# save plot
+plt5 = ggplot(MN18b, aes(x = bin)) +
+  geom_point(aes(y = qdnaseq_raw, color = qdnaseq_call), size = 0.7) +
+  geom_point(aes(y = qdnaseq_seg), size = 1) +
+  scale_color_manual(values = colors, drop = F) +
+  scale_y_continuous(limits = c(-2, 4), labels=comma_format(accuracy = 1), breaks = pretty_breaks(6)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  labs(y = "Log2 ratio", x = "", title = "MN18b") +
+  geom_vline(data = chr_bounds, aes(xintercept = max), linetype = 2) +
+  geom_text(data = chr_bounds, aes(x = mid, y = -Inf, label = chr), vjust = -0.5, hjust = "center", inherit.aes = F) +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
+plt5
+png("./plots/fig1b_MN18_BM.png", width = 16, height = 8, units = "in", res = 200)
+plt5
+dev.off()
+```
+
+## Calculating the percentage and number of segments of the genome that is amplified/deleted
+
+```{r percentage and number of alterations, include = TRUE}
+# Load in data
+data = readRDS("./data/full_cohort_50kb_CNAinformation.rds")
+annotation = fread("./data/patient_annotation/paired_cohort_annotation.csv")
+genomesize = readRDS("./data/full_cohort_50kb.rds")$MN1
+genomesize = genomesize[, sum(end-start)]
+
+# Merge data with annotation
+data = merge(data, annotation, by.x = "sample", by.y = "Filename")
+data[, location := ifelse(grepl("b", sample), "BM", "NSCLC")]
+data[, location := factor(location, levels = c("NSCLC", "BM"))]
+data[, sample := gsub("b", "", sample)]
+
+# Get percentage and number of SCNAs per patient
+percentage_altered = data[, .(percentage = sum(length) / genomesize * 100), by = .(CNA, sample, subtype, location)]
+number_altered = data[, .N, by = .(CNA, sample, subtype, location)]
+
+# Plot
+plt6 = ggplot(percentage_altered, aes(x = location, y = percentage, color = CNA)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_point(position = position_jitterdodge(jitter.width = .15)) +
+  scale_color_brewer(palette = "Set1") +
+  labs(y = "% of genome with SCNAs", x = "", title = "Percentage of genome alterated")
+
+plt6
+png("./plots/fig1c_percentage_CNAs.png", width = 8, height = 8, units = "in", res = 200)
+plt6
+dev.off()
+
+plt7 = ggplot(number_altered, aes(x = location, y = N, color = CNA)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_point(position = position_jitterdodge(jitter.width = .15)) +
+  scale_color_brewer(palette = "Set1") +
+  labs(y = "# of SCNAs in genome", x = "", title = "Number of alterations")
+
+plt7
+png("./plots/suppl_fig1c_number_CNAs.png", width = 8, height = 8, units = "in", res = 200)
+plt7
+dev.off()
+
+# Plot delta AMP/DEL percentage
+percentage_delta = dcast(percentage_altered, sample + CNA ~ location, value.var = "percentage")
+percentage_delta[is.na(NSCLC), NSCLC := 0]
+percentage_delta[is.na(BM), BM := 0]
+percentage_delta[, delta := BM - NSCLC]
+
+plt8 = ggplot(percentage_delta, aes(x = CNA, y = delta, color = CNA)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = .2, size = 2) +
+  geom_hline(yintercept = 0, linetype = 2) +
+  scale_color_brewer(palette = "Set1") +
+  labs(y = "Delta of % genome altered (BM vs NSCLC)", x = "") +
+  theme(legend.position = "none")
+
+plt8
+png("./plots/Suppl_fig1e_delta_CNApercentage.png", width = 8, height = 8, units = "in", res = 200)
+plt8
+dev.off()
+
+# Plot showing difference between LUAD and LUSC
+number_subtype = number_altered[, .(N = sum(N)), by = .(sample, subtype, location)]
+
+plt9 = ggplot(number_subtype, aes(x = location, y = N, color = subtype)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_point(position = position_jitterdodge(jitter.width = .15)) +
+  scale_color_npg() +
+  labs(y = "# of SCNAs in genome", x = "", title = "Number of alterations")
+
+plt9
+png("./plots/Suppl_fig1f_subtype_number_CNAs.png", width = 12, height = 8, units = "in", res = 200)
+plt9
+dev.off()
+
+# Show number/percentage of SCNAs in NSCLC vs BM (scatterplot)
+percentage_altered = dcast(percentage_altered, sample ~ location, value.var = "percentage", fun.aggregate = sum)
+number_altered = dcast(number_altered, sample ~ location, value.var = "N", fun.aggregate = sum)
+
+plt10 = ggplot(percentage_altered, aes(x = NSCLC, y = BM)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, linetype = 2, color = "red") +
+  labs(title = "Percentage of genome altered, BM vs NSCLC")  +
+  scale_x_continuous(limits = c(0, 50)) +
+  scale_y_continuous(limits = c(0, 50))
+
+plt10
+png("./plots/fig1d_BM_vs_NSCLC_scatterplot_CNA_percentage", width = 8, height = 8, units = "in", res = 200)
+plt10
+dev.off()
+
+plt11 = ggplot(number_altered, aes(x = NSCLC, y = BM)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, linetype = 2, color = "red") +
+  labs(title = "Number of alterations, BM vs NSCLC") +
+  scale_x_continuous(limits = c(0, 175)) +
+  scale_y_continuous(limits = c(0, 175))
+
+plt11
+png("./plots/suppl_fig1d_BM_vs_NSCLC_scatterplot_CNA_number.png", width = 8, height = 8, units = "in", res = 200)
+plt11
+dev.off()
+
+# Stratify size of alterations
+data[length < 1e6, alteration_size := "<1Mb"]
+data[length >= 1e6 & length < 1e7, alteration_size := "1-10Mb"]
+data[length >= 1e7, alteration_size := "10Mb+"]
+
+size_dt = data[, .(.N), by = .(sample, location, alteration_size)]
+total_sum = size_dt[, .(total_num = sum(N)), by = .(sample, location)]
+size_dt = merge(size_dt, total_sum, by = c("location", "sample"), all.x = T)
+size_dt[, percentage := N / total_num * 100]
+
+# Plot size of alterations
+plt12 = ggplot(size_dt, aes(x = alteration_size, y = percentage, color = location)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_point(position = position_jitterdodge(jitter.width = .2)) +
+  labs(y = "% of SCNAs", x = "SCNA size", title = "Distribution of SCNA sizes") +
+  scale_color_npg()
+
+plt12
+png("./plots/fig1e_SCNA_size_distribution.png", width = 12, height = 8, units = "in", res = 200)
+plt12
+dev.off()
+
+```
+
+Comparison of shallow-WGS with nanostring counts
+
+```{r comparison of shallow-WGS and nanostring, include=TRUE}
+nanostring = fread("./data/nanostring_cnv-validation_counts.tsv")
+cohort = readRDS("./data/full_cohort_50kb.rds")
+
+# Set sample names and remove information
+tmp = gsub("_...RCC.*", "", names(nanostring))
+tmp = gsub(".*_", "MN", tmp)
+
+setnames(nanostring, gsub("B", "b", tmp))
+
+# Remove MN5b
+nanostring = nanostring[, !grepl("MN5b", names(nanostring)), with = F]
+
+# Rename genes to proper hgnc symbols
+nanostring[`Region Name` == "MYCL1", `Region Name` := "MYCL"]
+nanostring[`Region Name` == "PARK2", `Region Name` := "PRKN"]
+nanostring[`Region Name` == "WHSC1L1", `Region Name` := "NSD3"]
+nanostring[`Region Name` == "C8orf4", `Region Name` := "TCIM"]
+nanostring[`Region Name` == "ORAOV1", `Region Name` := "LTO1"]
+
+
+# Get gene locations
+new_config = httr::config(ssl_verifypeer = FALSE)
+httr::set_config(new_config, override = FALSE)
+human = useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+attributes = c("chromosome_name", "start_position", "end_position", "hgnc_symbol")
+gene_info = getBM(attributes = attributes, 
+                  filters = "hgnc_symbol", 
+                  values = nanostring$`Region Name`,
+                  mart = human)
+
+# Remove gene locations on non-main chromosomes
+setDT(gene_info)
+gene_info = gene_info[chromosome_name %in% as.character(1:22), ]
+nanostring_full = merge(gene_info, nanostring, by.x = "hgnc_symbol", by.y = "Region Name")
+nanostring_full[, chromosome_name := as.numeric(chromosome_name)]
+
+# Setkeys
+setkey(nanostring_full, chromosome_name, start_position, end_position)
+
+# Get overlaps
+results = lapply(names(nanostring)[7:length(nanostring)], function(sample) {
+  # Set key
+  dt = cohort[[sample]]
+  setkey(dt, chr, start, end)
+
+  # Get cols
+  getCol = c("hgnc_symbol", "chromosome_name", "start_position", "end_position", sample)
+  
+  # Get overlaps
+  overlaps = foverlaps(dt, nanostring_full[, getCol, with = F])
+  overlaps_short = overlaps[, list(segmented_mean = mean(segmented), nanostring = get(sample)), by = "hgnc_symbol"]
+  
+  return(unique(overlaps_short, by = "hgnc_symbol"))
+  
+})
+
+tocor = rbindlist(results)
+tocor = tocor[!is.na(hgnc_symbol)]
+
+plt13 = ggplot(tocor, aes(segmented_mean, as.numeric(nanostring))) + 
+  geom_point() +
+  labs(y = "Nanostring counts", x = "Log2 ratio", title = "Nanostring counts versus shallow-WGS log2 ratio") +
+  stat_cor()
+
+plt13
+png("./plots/suppl_fig1g_log2ratio_vs_nanostring.png", width = 8, height = 8, units = "in", res = 200)
+plt13
+dev.off()
+
+# Plot boxplots
+tocor[segmented_mean >= log2(2.5/2), cna_wgs := "Amplified"]
+tocor[segmented_mean <= log2(1.5/2), cna_wgs := "Deleted"]
+tocor[segmented_mean < log2(2.5/2) & segmented_mean > log2(1.5/2), cna_wgs := "Neutral"]
+tocor[, cna_wgs := factor(cna_wgs, levels = c("Amplified", "Deleted", "Neutral"))]
+
+plt14 = ggplot(tocor, aes(x = cna_wgs, y = nanostring, color = cna_wgs)) +
+  geom_boxplot() +
+  labs(y = "Nanostring counts", x = "QDNAseq call", title = "Nanostring counts stratified by QDNAseq call") +
+  scale_color_brewer(palette = "Set1") +
+  stat_compare_means(comparisons = list(c("Amplified", "Deleted"), c("Amplified", "Neutral"), c("Deleted", "Neutral"))) +
+  theme(legend.position = "none")
+
+plt14
+png("./plots/suppl_fig1h_QDNAseq_call_vs_nanostring.png", width = 8, height = 8, units = "in", res = 200)
+plt14
+dev.off()
+
+```
+
+## Analysis of distribution of alterations over the genome and chromsome arms amplified or deleted
+
+```{r analysis of the distribution of alterations over the genome, include=TRUE}
+# Prepare data
+cohort = readRDS("./data/full_cohort_500kb.rds")
+full_cohort = lapply(1:length(cohort), function(i) {
+  cohort[[i]][, sample := names(cohort[i])]
+  return(cohort[[i]])
+})
+
+full_cohort = rbindlist(full_cohort)
+
+# Set location
+full_cohort[, location := ifelse(grepl("b", sample), "BM", "NSCLC")]
+
+# Call alterations
+full_cohort[segmented > log2(2.5/2), alteration := "Amplification"]
+full_cohort[segmented < log2(1.5/2), alteration := "Deletion"]
+
+# Get counts of AMP/DEL per bin
+alteration_freq = full_cohort[, .(percentage = .N / (length(cohort)/2) * 100), by = .(chr, start, end, feature, location, alteration)]
+alteration_freq[is.na(alteration), percentage := NA]
+
+# Deletion * minus to get left axis
+alteration_freq[alteration == "Deletion", percentage := percentage * -1]
+
+# Split by location
+nsclc_freq = alteration_freq[location == "NSCLC"]
+bm_freq = alteration_freq[location == "BM"]
+
+# Dcast for binning
+nsclc_freq = dcast(nsclc_freq, chr+start+end+feature ~ alteration, value.var = "percentage")
+bm_freq = dcast(bm_freq, chr+start+end+feature ~ alteration, value.var = "percentage")
+
+# Prepare bins
+nsclc_freq[, bin := seq_along(chr)]
+nsclc_freq[, end_cum := cumsum((end - start) + 1)]
+nsclc_freq[, start_cum := c(1, end_cum[1:length(end_cum)-1] + 1)]
+nsclc_freq = melt(nsclc_freq, id.vars = c("chr", "start", "end", "feature", "bin", "start_cum", "end_cum"))
+
+bm_freq[, bin := seq_along(chr)]
+bm_freq[, end_cum := cumsum((end - start) + 1)]
+bm_freq[, start_cum := c(1, end_cum[1:length(end_cum)-1] + 1)]
+bm_freq = melt(bm_freq, id.vars = c("chr", "start", "end", "feature", "bin", "start_cum", "end_cum"))
+
+# Make chr_bounds
+chr_bounds = nsclc_freq[, list(min = min(bin), max = max(bin), chrlen_bp = sum(end-start)), by = chr]
+chr_bounds = chr_bounds %>% 
+  mutate(mid = round(min + (max-min) / 2,0),
+         end_bp=cumsum(as.numeric(chrlen_bp)), 
+         start_bp = end_bp - chrlen_bp, 
+         mid_bp = round((chrlen_bp / 2) + start_bp, 0))
+
+# Plot frequency
+# NSCLC
+plt15 = ggplot(nsclc_freq, aes(x = bin, y = value, color = variable)) +
+  geom_col() +
+  geom_vline(data = chr_bounds, aes(xintercept = max), linetype = 2) +
+  geom_text(data = chr_bounds, aes(x = mid, y = -Inf, label = chr), vjust = -0.5, hjust = "center", inherit.aes = F) +
+  scale_color_brewer(palette = "Set1") +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(limits = c(-75, 75), breaks = seq(-75, 75, by = 25), labels = paste(abs(seq(-75, 75, by = 25)), "%")) + 
+  coord_flip() +
+  theme(legend.position = "top",
+        axis.line.x = element_line(),
+        axis.ticks.x = element_line(),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank())
+
+plt14
+png("./plots/fig1f_NSCLC_genomwide_SCNA_frequency.png", width = 8, height = 14, units = "in", res = 200)
+plt14
+dev.off()
+
+# BM
+plt16 = ggplot(bm_freq, aes(x = bin, y = value, color = variable)) +
+  geom_col() +
+  geom_vline(data = chr_bounds, aes(xintercept = max), linetype = 2) +
+  geom_text(data = chr_bounds, aes(x = mid, y = -Inf, label = chr), vjust = -0.5, hjust = "center", inherit.aes = F) +
+  scale_color_brewer(palette = "Set1") +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(limits = c(-75, 75), breaks = seq(-75, 75, by = 25), labels = paste(abs(seq(-75, 75, by = 25)), "%")) + 
+  coord_flip() +
+  theme(legend.position = "top",
+        axis.line.x = element_line(),
+        axis.ticks.x = element_line(),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank())
+
+plt15
+png("./plots/fig1g_BM_genomwide_SCNA_frequency.png", width = 8, height = 14, units = "in", res = 200)
+plt15
+dev.off()
+
+```
+
+## Frequency of chromosomal arm alterations
+```{r frequency of chr arm alterations, include=TRUE}
+# Load in data
+total = readRDS("./data/full_cohort_50kb.rds")
+annot = fread("./data/patient_annotation/paired_cohort_annotation.csv", select = c(1, 5))
+chrom_splits = fread("./data/hg19_chromosome_splits.bed")
+
+# Add arm annotation
+total = lapply(total, function(x){
+  for(i in c(1:22)){
+    x[chr == i, arm := ifelse(end < chrom_splits$V2[chrom_splits$V1 == i], paste0(i, "p"), paste0(i, "q"))]
+  };
+  return(x)
+})
+
+#get list of medians per chromosomal arm for each data.table
+output = data.table(arm = unique(total[[1]]$arm))
+output[, names(total) := 0]
+
+# Get alteration information per chromosome arm
+invisible(lapply(1:length(total), function(x){
+  for(i in output$arm){
+    if(nrow(total[[x]][arm == i & segmented >= log2(2.5/2)]) >= nrow(total[[x]][arm == i]) / 2) output[arm == i, names(total[x]) := 1]
+    if(nrow(total[[x]][arm == i & segmented <= log2(1.5/2)]) >= nrow(total[[x]][arm == i]) / 2) output[arm == i, names(total[x]) := -1]
+  }
+}))
+
+#melt data
+output[output == 1] = "AMP"
+output[output == -1] = "DEL"
+output[output == 0] = ""
+
+#get annotations
+setnames(annot, c("sample", "subtype"))
+annot[, sample := factor(sample, levels = sample)]
+annot[, location := ifelse(grepl("b", sample), "BM", "NSCLC")]
+annot = as.data.frame(annot)
+
+# #add all samples
+# add_cols = as.character(annot$sample_id[!annot$sample_id %in% colnames(output)])
+# output[, (add_cols) := ""]
+
+#set rownames
+mat = as.data.frame(output)
+rownames(mat) = mat$arm
+mat$arm = NULL
+
+#order in annotation order
+mat = mat[, as.vector(annot$sample)]
+
+# annotation
+#annot <-reshape2::melt(annot, id.vars = "sample_id")
+annot_cols = list("subtype" = c("ADENOCARCINOMA" = viridis(4)[1], "SQUAMOUS CELL CARCINOMA" = viridis(4)[2]),
+                  location = c("BM" = viridis(4)[3], "NSCLC" = viridis(4)[4])) #paired
+ha = HeatmapAnnotation(subtype=annot$subtype, location = annot$location, col = annot_cols)
+
+# colors
+cols = brewer.pal(3, "Set1")[c(1, 2)]
+names(cols) = c("AMP", "DEL")
+
+#plot
+plt16 = oncoPrint(mat,
+          alter_fun = list(
+            background = alter_graphic("rect", width = 0.9, height = 0.9, fill = "#FFFFFF", col = "black"),
+            AMP = alter_graphic("rect", width = 0.85, height = 0.85, fill = cols["AMP"]),
+            DEL = alter_graphic("rect", width = 0.85, height = 0.85, fill = cols["DEL"])),
+          col = cols, border = "black", bottom_annotation = ha, show_column_names = T)
+
+plt16
+png("./plots/fig1h_Gene_level_SCNAs_oncoprint.png", width = 18, height = 12, units = "in", res = 200)
+plt16
+dev.off()
+
+```
+
+## Analysis of multi-region CUTseq
+
+```{r multiregion analysis, include=TRUE}
+# Load in data
+total = readRDS("./data/multi-region_HQ_50kb.rds")
+
+# Make dendrogram
+hc = hclust(dist(t(total[, 5:ncol(total)])), method = "average")
+dhc = as.dendrogram(hc)
+
+# Rectangular lines
+ddata = dendro_data(dhc, type = "rectangle")
+
+# Plot Dendrogram
+dendro = ggplot(ggdendro::segment(ddata)) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend)) +
+  coord_flip() + 
+  scale_y_reverse(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0.02, 0.02)) +
+  theme_dendro()
+
+# Prepare binning
+total[, bin := seq_along(chr)]
+total[, end_cum := cumsum((end - start) + 1)]
+total[, start_cum := c(1, end_cum[1:length(end_cum)-1] + 1)]
+
+# Make chr_bounds
+chr_bounds = total[, list(min = min(bin), max = max(bin), chrlen_bp = sum(end-start)), by = chr]
+chr_bounds = chr_bounds %>% 
+  mutate(mid = round(min + (max-min) / 2,0),
+         end_bp=cumsum(as.numeric(chrlen_bp)), 
+         start_bp = end_bp - chrlen_bp, 
+         mid_bp = round((chrlen_bp / 2) + start_bp, 0))
+
+# Set colors
+colors = c(brewer.pal(3, "Set1")[1:2], "#c1c1c1")
+names(colors) = c("Amplification", "Deletion", "Neutral")
+
+# Prepare for heatmap
+total_m = melt(total, id.vars = c("chr", "start", "end", "bin", "start_cum", "end_cum", "feature"))
+
+# Set sample order
+total_m[, variable := factor(variable, levels = ddata$labels$label)]
+
+# Plot heatmap 20K+
+heatmap = ggplot(total_m) +
+  geom_linerange(aes(ymin = start_cum, ymax = end_cum, x = variable, color = value), size = 2) +
+  coord_flip() +
+  scale_color_gradient2(midpoint = 0, low = "blue", high = "red", limits = c(-2, 2), oob = scales::squish) +
+  labs(color = "Log2 ratio") + 
+  scale_y_continuous(expand = c(0, 0), labels = chr_bounds$chr, breaks = chr_bounds$mid_bp) + 
+  geom_hline(data = chr_bounds, aes(yintercept = end_bp), linetype = 1, size = .8) +
+  theme(axis.ticks.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title = element_blank())
+
+plt17 = plot_grid(dendro, heatmap,  align = "h", rel_widths = c(0.2, 2), ncol = 2)
+
+plt17
+png("./plots/fig2a_multi_region_heatmap.png", width = 18, height = 14, units = "in", res = 200)
+plt17
+dev.off()
+```
+
+```{r plot PCC within samples, include=TRUE}
+# Load in data
+total = readRDS("./data/multi-region_HQ_50kb.rds")
+annot = fread("./data/patient_annotation/paired_cohort_annotation.csv")
+
+# Get samples
+samples = colnames(total[,5:ncol(total)])
+patient_id = gsub("_.*|B", "", samples)
+patient_id = paste0("MN", patient_id)
+
+# Subselect annotations
+annot = annot[Filename %in% patient_id, ]
+
+annot_mr = data.table(samples = samples, patient_id = patient_id)
+annot_mr = merge(annot_mr, annot[, c(1, 5)], by.x = "patient_id", by.y = "Filename")
+
+# Make list of vectors with samplenames of same full region
+list_ids = lapply(as.character(1:57), function(x) samples[grepl(paste0("^", x, "B"), samples)])
+
+# Get pairwise pearson correlation in each list
+correlations = lapply(list_ids, function(x) {
+  cor_mat = cor(total[, ..x])
+  cor_vec = cor_mat[lower.tri(cor_mat, diag = F)]
+  cor_vec = as.data.table(cor_vec)
+  cor_vec[, names := unique(gsub("B.*", "", x))]
+})
+
+total_cor = bind_rows(correlations)
+total_cor[, names := paste0("MN", names, "B")]
+
+plt18 = ggplot(total_cor, aes(x = names, y = cor_vec, color = names)) + 
+  geom_jitter(width = 0.1) +
+  scale_y_continuous(limits = c(0, 1)) +
+  scale_color_viridis_d() +
+  labs(y = "Pairwise Pearson's Correlation", x = "") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+        legend.position = "")
+
+plt18
+png("./plots/fig2b_multi-region_PCC.png", width = 8, height = 8, units = "in", res = 200)
+plt18
+dev.off()
+```
+
+
+```{r plot individual ideograms, include=TRUE}
+# Load data
+segmented = readRDS("./data/multi-region_HQ_50kb.rds")
+raw = readRDS("./data/multi-region_HQ_50kb_raw.rds")
+
+# Select MN47B samples
+segmented = cbind(segmented[, 1:4], segmented[, grepl("47B", colnames(segmented)), with = F])
+raw = cbind(raw[, 1:4], raw[, grepl("47B", colnames(raw)), with = F])
+
+segmented[, chr := paste0("chr", chr)]
+segmented = makeGRangesFromDataFrame(segmented, keep.extra.columns = T)
+
+raw[, chr := paste0("chr", chr)]
+raw = makeGRangesFromDataFrame(raw, keep.extra.columns = T)
+
+# Plot
+# Chromosome 12
+kp = plotKaryotype(chromosomes = "chr12", cex = 2)
+kpPoints(kp, data = raw, y = raw@elementMetadata[[2]], cex = 0.6, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "grey50")
+kpPoints(kp, data = segmented, y = segmented@elementMetadata[[2]], cex = 0.8, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "black")
+kpAxis(kp, ymin=-2, ymax=4, col="grey50", cex=2, numticks = 4)
+kpAbline(kp, h = log2(2.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAbline(kp, h = log2(1.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAddMainTitle(kp, main = names(segmented@elementMetadata[2]), cex = 2.5)
+
+kp = plotKaryotype(chromosomes = "chr12", cex = 2)
+kpPoints(kp, data = raw, y = raw@elementMetadata[[3]], cex = 0.6, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "grey50")
+kpPoints(kp, data = segmented, y = segmented@elementMetadata[[3]], cex = 0.8, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "black")
+kpAxis(kp, ymin=-2, ymax=4, col="grey50", cex=2, numticks = 4)
+kpAbline(kp, h = log2(2.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAbline(kp, h = log2(1.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAddMainTitle(kp, main = names(segmented@elementMetadata[3]), cex = 2.5)
+
+kp = plotKaryotype(chromosomes = "chr12", cex = 2)
+kpPoints(kp, data = raw, y = raw@elementMetadata[[4]], cex = 0.6, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "grey50")
+kpPoints(kp, data = segmented, y = segmented@elementMetadata[[4]], cex = 0.8, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "black")
+kpAxis(kp, ymin=-2, ymax=4, col="grey50", cex=2, numticks = 4)
+kpAbline(kp, h = log2(2.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAbline(kp, h = log2(1.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAddMainTitle(kp, main = names(segmented@elementMetadata[4]), cex = 2.5)
+
+kp = plotKaryotype(chromosomes = "chr12", cex = 2)
+kpPoints(kp, data = raw, y = raw@elementMetadata[[5]], cex = 0.6, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "grey50")
+kpPoints(kp, data = segmented, y = segmented@elementMetadata[[5]], cex = 0.8, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "black")
+kpAxis(kp, ymin=-2, ymax=4, col="grey50", cex=2, numticks = 4)
+kpAbline(kp, h = log2(2.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAbline(kp, h = log2(1.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAddMainTitle(kp, main = names(segmented@elementMetadata[5]), cex = 2.5)
+
+# Chromosome 17
+kp = plotKaryotype(chromosomes = "chr17", cex = 2)
+kpPoints(kp, data = raw, y = raw@elementMetadata[[2]], cex = 0.6, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "grey50")
+kpPoints(kp, data = segmented, y = segmented@elementMetadata[[2]], cex = 0.8, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "black")
+kpAxis(kp, ymin=-2, ymax=4, col="grey50", cex=2, numticks = 4)
+kpAbline(kp, h = log2(2.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAbline(kp, h = log2(1.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAddMainTitle(kp, main = names(segmented@elementMetadata[2]), cex = 2.5)
+
+kp = plotKaryotype(chromosomes = "chr17", cex = 2)
+kpPoints(kp, data = raw, y = raw@elementMetadata[[3]], cex = 0.6, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "grey50")
+kpPoints(kp, data = segmented, y = segmented@elementMetadata[[3]], cex = 0.8, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "black")
+kpAxis(kp, ymin=-2, ymax=4, col="grey50", cex=2, numticks = 4)
+kpAbline(kp, h = log2(2.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAbline(kp, h = log2(1.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAddMainTitle(kp, main = names(segmented@elementMetadata[3]), cex = 2.5)
+
+kp = plotKaryotype(chromosomes = "chr17", cex = 2)
+kpPoints(kp, data = raw, y = raw@elementMetadata[[4]], cex = 0.6, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "grey50")
+kpPoints(kp, data = segmented, y = segmented@elementMetadata[[4]], cex = 0.8, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "black")
+kpAxis(kp, ymin=-2, ymax=4, col="grey50", cex=2, numticks = 4)
+kpAbline(kp, h = log2(2.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAbline(kp, h = log2(1.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAddMainTitle(kp, main = names(segmented@elementMetadata[4]), cex = 2.5)
+
+kp = plotKaryotype(chromosomes = "chr17", cex = 2)
+kpPoints(kp, data = raw, y = raw@elementMetadata[[5]], cex = 0.6, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "grey50")
+kpPoints(kp, data = segmented, y = segmented@elementMetadata[[5]], cex = 0.8, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "black")
+kpAxis(kp, ymin=-2, ymax=4, col="grey50", cex=2, numticks = 4)
+kpAbline(kp, h = log2(2.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAbline(kp, h = log2(1.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAddMainTitle(kp, main = names(segmented@elementMetadata[5]), cex = 2.5)
+```
+
+```{r plot individual ideograms saving only, include=FALSE}
+# Load data
+segmented = readRDS("./data/multi-region_HQ_50kb.rds")
+raw = readRDS("./data/multi-region_HQ_50kb_raw.rds")
+
+# Select MN47B samples
+segmented = cbind(segmented[, 1:4], segmented[, grepl("47B", colnames(segmented)), with = F])
+raw = cbind(raw[, 1:4], raw[, grepl("47B", colnames(raw)), with = F])
+
+segmented[, chr := paste0("chr", chr)]
+segmented = makeGRangesFromDataFrame(segmented, keep.extra.columns = T)
+
+raw[, chr := paste0("chr", chr)]
+raw = makeGRangesFromDataFrame(raw, keep.extra.columns = T)
+
+# Plot
+# Chromosome 12
+kp = plotKaryotype(chromosomes = "chr12", cex = 2)
+kpPoints(kp, data = raw, y = raw@elementMetadata[[2]], cex = 0.6, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "grey50")
+kpPoints(kp, data = segmented, y = segmented@elementMetadata[[2]], cex = 0.8, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "black")
+kpAxis(kp, ymin=-2, ymax=4, col="grey50", cex=2, numticks = 4)
+kpAbline(kp, h = log2(2.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAbline(kp, h = log2(1.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAddMainTitle(kp, main = names(segmented@elementMetadata[2]), cex = 2.5)
+ggsave(paste0("./plots/fig2c_ideogram_chr12_", names(segmented@elementMetadata[2]), ".png"), units = "in", dpi = 200, height = 8, width = 12)
+
+kp = plotKaryotype(chromosomes = "chr12", cex = 2)
+kpPoints(kp, data = raw, y = raw@elementMetadata[[3]], cex = 0.6, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "grey50")
+kpPoints(kp, data = segmented, y = segmented@elementMetadata[[3]], cex = 0.8, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "black")
+kpAxis(kp, ymin=-2, ymax=4, col="grey50", cex=2, numticks = 4)
+kpAbline(kp, h = log2(2.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAbline(kp, h = log2(1.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAddMainTitle(kp, main = names(segmented@elementMetadata[3]), cex = 2.5)
+ggsave(paste0("./plots/fig2c_ideogram_chr12_", names(segmented@elementMetadata[3]), ".png"), units = "in", dpi = 200, height = 8, width = 12)
+
+kp = plotKaryotype(chromosomes = "chr12", cex = 2)
+kpPoints(kp, data = raw, y = raw@elementMetadata[[4]], cex = 0.6, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "grey50")
+kpPoints(kp, data = segmented, y = segmented@elementMetadata[[4]], cex = 0.8, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "black")
+kpAxis(kp, ymin=-2, ymax=4, col="grey50", cex=2, numticks = 4)
+kpAbline(kp, h = log2(2.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAbline(kp, h = log2(1.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAddMainTitle(kp, main = names(segmented@elementMetadata[4]), cex = 2.5)
+ggsave(paste0("./plots/fig2c_ideogram_chr12_", names(segmented@elementMetadata[4]), ".png"), units = "in", dpi = 200, height = 8, width = 12)
+
+kp = plotKaryotype(chromosomes = "chr12", cex = 2)
+kpPoints(kp, data = raw, y = raw@elementMetadata[[5]], cex = 0.6, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "grey50")
+kpPoints(kp, data = segmented, y = segmented@elementMetadata[[5]], cex = 0.8, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "black")
+kpAxis(kp, ymin=-2, ymax=4, col="grey50", cex=2, numticks = 4)
+kpAbline(kp, h = log2(2.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAbline(kp, h = log2(1.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAddMainTitle(kp, main = names(segmented@elementMetadata[5]), cex = 2.5)
+ggsave(paste0("./plots/fig2c_ideogram_chr12_", names(segmented@elementMetadata[5]), ".png"), units = "in", dpi = 200, height = 8, width = 12)
+
+# Chromosome 17
+kp = plotKaryotype(chromosomes = "chr17", cex = 2)
+kpPoints(kp, data = raw, y = raw@elementMetadata[[2]], cex = 0.6, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "grey50")
+kpPoints(kp, data = segmented, y = segmented@elementMetadata[[2]], cex = 0.8, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "black")
+kpAxis(kp, ymin=-2, ymax=4, col="grey50", cex=2, numticks = 4)
+kpAbline(kp, h = log2(2.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAbline(kp, h = log2(1.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAddMainTitle(kp, main = names(segmented@elementMetadata[2]), cex = 2.5)
+ggsave(paste0("./plots/fig2c_ideogram_chr17_", names(segmented@elementMetadata[2]), ".png"), units = "in", dpi = 200, height = 8, width = 12)
+
+kp = plotKaryotype(chromosomes = "chr17", cex = 2)
+kpPoints(kp, data = raw, y = raw@elementMetadata[[3]], cex = 0.6, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "grey50")
+kpPoints(kp, data = segmented, y = segmented@elementMetadata[[3]], cex = 0.8, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "black")
+kpAxis(kp, ymin=-2, ymax=4, col="grey50", cex=2, numticks = 4)
+kpAbline(kp, h = log2(2.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAbline(kp, h = log2(1.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAddMainTitle(kp, main = names(segmented@elementMetadata[3]), cex = 2.5)
+ggsave(paste0("./plots/fig2c_ideogram_chr17_", names(segmented@elementMetadata[3]), ".png"), units = "in", dpi = 200, height = 8, width = 12)
+
+kp = plotKaryotype(chromosomes = "chr17", cex = 2)
+kpPoints(kp, data = raw, y = raw@elementMetadata[[4]], cex = 0.6, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "grey50")
+kpPoints(kp, data = segmented, y = segmented@elementMetadata[[4]], cex = 0.8, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "black")
+kpAxis(kp, ymin=-2, ymax=4, col="grey50", cex=2, numticks = 4)
+kpAbline(kp, h = log2(2.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAbline(kp, h = log2(1.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAddMainTitle(kp, main = names(segmented@elementMetadata[4]), cex = 2.5)
+ggsave(paste0("./plots/fig2c_ideogram_chr17_", names(segmented@elementMetadata[4]), ".png"), units = "in", dpi = 200, height = 8, width = 12)
+
+kp = plotKaryotype(chromosomes = "chr17", cex = 2)
+kpPoints(kp, data = raw, y = raw@elementMetadata[[5]], cex = 0.6, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "grey50")
+kpPoints(kp, data = segmented, y = segmented@elementMetadata[[5]], cex = 0.8, r0 = 0, r1 = 1, ymax = 4, ymin = -2, col = "black")
+kpAxis(kp, ymin=-2, ymax=4, col="grey50", cex=2, numticks = 4)
+kpAbline(kp, h = log2(2.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAbline(kp, h = log2(1.5/2), lty = 2, r0 = 0, r1 = 1, ymin = -2, ymax = 4)
+kpAddMainTitle(kp, main = names(segmented@elementMetadata[5]), cex = 2.5)
+ggsave(paste0("./plots/fig2c_ideogram_chr17_", names(segmented@elementMetadata[5]), ".png"), units = "in", dpi = 200, height = 8, width = 12)
+```
+
+## Percentage of genome altered of validation cohort
+
+```{r validation cohort percentage analysis, include=TRUE}
+# Read data
+output = readRDS("./data/BM_HQ_50kb.rds")
+annot = fread("./data/patient_annotation/BM_annotations_selection.csv", select = c(1, 6))
+
+#get names from files
+names = gsub(".*\\/|.wgs.*", "", names(output))
+
+# Calculate percentage of amp/del/aneuploidy
+totalLength = nrow(output[[1]])
+percAmp = unlist(lapply(output, function(x) length(which(x$segmented >= log2(2.5/2))) / totalLength * 100))
+percDel = unlist(lapply(output, function(x) length(which(x$segmented <= log2(1.5/2))) / totalLength * 100))
+
+# Combine all data
+total = as.data.table(cbind(names, percAmp, percDel))
+total = total[naturalorder(total$names)]
+
+# annotating samples with subtype and melt for plotting
+total = merge(total, annot, by.x = "names", by.y = "sample_id")
+total = melt(total, id.vars = c("names", "subtype"))
+total[, value := as.numeric(value)]
+
+# plot
+plt19 = ggplot(total, aes(x = variable, y = value, color = variable)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2) +
+  scale_color_brewer(palette = "Set1") +
+  scale_x_discrete(labels = c("Amplified", "Deleted")) +
+  labs(y = "Genome altered (%)", x = "") +
+  theme(legend.position = "")
+
+plt19
+png("./plots/suppl_fig3a_multi-region_PCC.png", width = 8, height = 8, units = "in", res = 200)
+plt19
+dev.off()
+
+plt20 = ggplot(total, aes(x = subtype, y = value, color = variable)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_point(position = position_jitterdodge(jitter.width = 0.2)) +
+  scale_color_brewer(palette = "Set1") +
+  scale_x_discrete(labels = c("Amplified", "Deleted")) +
+  labs(y = "Genome altered (%)", x = "") +
+  theme(legend.position = "")
+
+plt20
+png("./plots/suppl_fig3b_multi-region_PCC.png", width = 8, height = 8, units = "in", res = 200)
+plt20
+dev.off()
+```
+
+## Gene level analysis
+
+```{r gene level analysis discovery cohort, include=TRUE}
+# Load in data
+discovery = readRDS("./data/full-cohort-50kb_CNA-geneoverlaps-cosmicplus.rds")
+
+# Load in discovery annotation
+annot = fread("./data/patient_annotation/paired_cohort_annotation.csv", select = c(1, 5))
+setnames(annot, c("sample", "subtype"))
+annot[, sample := factor(sample, levels = sample)]
+annot[, location := ifelse(grepl("b", sample), "BM", "NSCLC")]
+annot = as.data.frame(annot)
+
+# annotation
+annot_cols = list("subtype" = c("ADENOCARCINOMA" = viridis(4)[1], "SQUAMOUS CELL CARCINOMA" = viridis(4)[2]),
+                  location = c("BM" = viridis(4)[3], "NSCLC" = viridis(4)[4]))
+ha = HeatmapAnnotation(subtype=annot$subtype, location = annot$location, col = annot_cols)
+
+# Plot gene oncoprint of discovery cohort
+mat_genes = dcast(discovery, gene~sample, value.var = "CNA", fun.aggregate = function(x) paste0(unique(x), collapse = ";"))
+
+#add all samples
+add_cols = as.character(annot$sample[!annot$sample %in% colnames(mat_genes)])
+mat_genes[, (add_cols) := ""]
+
+#set rownames
+mat_genes = as.data.frame(mat_genes)
+rownames(mat_genes) = mat_genes$gene
+mat_genes$gene = NULL
+
+# combine
+# mat_genes = mat_genes[, colnames(mat)]
+maxgenes = 50
+subs = tail(sort(rowSums(mat_genes == "AMP" | mat_genes == "DEL")), maxgenes)
+mat_genes_subset = mat_genes[names(subs), ]
+
+cols = brewer.pal(3, "Set1")[c(1, 2)]
+names(cols) = c("AMP", "DEL")
+
+plt21 = oncoPrint(mat_genes_subset,
+           alter_fun = list(
+             background = alter_graphic("rect", width = 0.9, height = 0.9, fill = "#FFFFFF", col = "black"),
+             AMP = alter_graphic("rect", width = 0.85, height = 0.85, fill = cols["AMP"]),
+             DEL = alter_graphic("rect", width = 0.85, height = 0.85, fill = cols["DEL"])), 
+           col = cols, border = "black", bottom_annotation = ha, show_column_names = T)
+
+plt21
+png("./plots/fig3a_CNA_genes_discovery_cohort_oncoprint.png", width = 18, height = 18, units = "in", res = 200)
+plt21
+dev.off()
+```
+
+```{r gene level analysis of discovery cohort using GISTIC2, include=TRUE}
+# Load in gene-level GISTIC2 data
+prim_amp = fread("./data/GISTIC2/primary/amp_genes.conf_90.txt",
+                 drop = 1)
+prim_del = fread("./data/GISTIC2/primary/del_genes.conf_90.txt",
+                 drop = 1)
+met_amp = fread("./data/GISTIC2/metastasis/amp_genes.conf_90.txt",
+                 drop = 1)
+met_del = fread("./data/GISTIC2/metastasis/del_genes.conf_90.txt",
+                 drop = 1)
+cosmicplus = fread("./data/cosmicplus.tsv")
+
+# Notate datasets for looping (only note the gene level ones)
+datasets = c("prim_amp", "prim_del", "met_amp", "met_del")
+
+# Apply through datasets and over columns to get all genes with their respective q values
+tmp = lapply(datasets, function(y){
+  lapply(colnames(get(y)), function(x) {
+    tmp = data.table(get(y)[5:nrow(prim_amp), ..x], get(y)[2, ..x], y)
+    setnames(tmp, c("gene", "qvalue", "variable"))
+    tmp = tmp[grepl(".", tmp$gene),]
+    return(tmp)
+    })
+})
+
+# Bind the nested list of output
+tmp = lapply(1:length(tmp), function(x){
+  rbindlist(tmp[[x]])
+})
+
+# bind the list of previous row_bind and select genes that overlap in cosmicplus genelist
+genes = bind_rows(tmp)
+genes = genes[gene %in% cosmicplus$gene]
+genes[, qvalue := as.numeric(qvalue)]
+
+#get unique genes based on gene+variable (removes duplicated entries where one gene overlaps multiple amp/del peaks)
+genes = unique(genes, by = c("gene", "variable"))
+
+# Split prim/met into columns
+prim = genes[grepl("prim", genes$variable),]
+met = genes[grepl("met", genes$variable),]
+setnames(prim, "qvalue", "qvalue_prim")
+setnames(met, "qvalue", "qvalue_met")
+
+# Remove 'prim' and 'met' from variable
+prim[, variable := gsub("prim_", "", variable)]
+met[, variable := gsub("met_", "", variable)]
+
+# Set values >0.2 to .2
+prim[qvalue_prim > 0.05, qvalue_prim := .2]
+met[qvalue_met > 0.05, qvalue_met := .2]
+
+# merge
+total = merge(prim, met, by = c("gene", "variable"), all = T)
+
+# Set NAs to .2 and set NAs to rows with both '.2'
+total[is.na(total)] = .2
+total[qvalue_prim == .2 & qvalue_met == .2, c("qvalue_prim", "qvalue_met") := NA]
+
+# Transform function
+reverselog_trans = function(base = 10){
+  trans = function(x) -log(x,base)
+  inv = function(x) base^(-x)
+  
+  scales::trans_new(name = "reverselog", transform = trans, inverse = inv,
+                    breaks = scales::log_breaks(base = base),
+                    domain = c(10^(-60),Inf)
+  )}
+# Get min value for limits
+min_val = min(c(min(total$qvalue_prim, na.rm = T), min(total$qvalue_met, na.rm = T)))
+
+breaks = c(.2, 1e-2, 1e-4, 1e-6, 1e-8, 1e-10, 1e-12, 1e-14, 1e-16, 1e-18)
+labels = c("NS", 1e-2, 1e-4, 1e-6, 1e-8, 1e-10, 1e-12, 1e-14, 1e-16, 1e-18)
+
+plt22 = ggplot(total, aes(x = qvalue_prim, y = qvalue_met, labels = gene, color = variable)) +
+  geom_point() +
+  geom_vline(xintercept = 0.05, linetype = 2, color = "red") +
+  geom_hline(yintercept = 0.05, linetype = 2, color = "red") +
+  scale_color_brewer(palette = "Set1") +
+  geom_text_repel(data = total,
+                  label = total$gene) +
+  labs(y = "q-value (M)", x = "q-value (T)") +
+  scale_x_continuous(trans = reverselog_trans(), limits = c(.2, min(min_val)), 
+                     breaks = breaks, labels = labels) +
+  scale_y_continuous(trans = reverselog_trans(), limits = c(.2, min(min_val)),
+                     breaks = breaks, labels = labels)
+
+plt22
+png("./plots/fig3b_gistic_scores_discoverycohort.png", width = 8, height = 8, units = "in", res = 200)
+plt22
+dev.off()
+```
+
+
+```{r gene level alteration comparison between discovery and validation cohorts, include=TRUE}
+# Load in all cohorts
+discovery = readRDS("./data/full-cohort-50kb_CNA-geneoverlaps-cosmicplus.rds")
+validation = readRDS("./data/BM-50kb_CNA-geneoverlaps-cosmicplus.rds")
+
+# Set N per cohort
+disc_n = 51
+val_n = 84
+
+discovery = discovery[grepl("b", sample)]
+
+# Get counts
+disc_count = discovery[, .N, by = .(CNA, gene)]
+val_count = validation[, .N, by = .(CNA, gene)]
+
+# Unique and sum
+disc_count = disc_count[, .(discovery = sum(N) / disc_n), by = .(CNA, gene)]
+val_count = val_count[, .(validation = sum(N) / val_n), by = .(CNA, gene)]
+
+# merge
+counts = merge(disc_count, val_count, id.vars = c("CNA", "gene"))
+
+# Plot
+plt23 = ggplot(counts, aes(x = discovery, y = validation)) +
+  geom_point(size = 3) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_x_continuous(labels = scales::percent_format()) +
+  scale_color_brewer(palette = "Set1") +
+  labs(y = "Validation", x = "Discovery") +
+  stat_cor(data = counts, aes(x = discovery, y = validation), inherit.aes = F) +
+  geom_smooth(method = "lm", se = F, linetype = 2, color = "red", size = 2)
+
+plt23
+png("./plots/Suppl_fig3c_SCNA_percentage_discovery_vs_validation.png", width = 8, height = 8, units = "in", res = 200)
+plt23
+dev.off()
+
+```
+
+```{r gene level analysis all cohorts only gistic driver genes, include = TRUE}
+# Load in all cohorts
+discovery = readRDS("./data/full-cohort-50kb_CNA-geneoverlaps-cosmicplus.rds")
+validation = readRDS("./data/BM-50kb_CNA-geneoverlaps-cosmicplus.rds")
+tcga_files = list.files("./data/tcga/", full.names = TRUE)
+drivers = fread("./data/putative-drivers_chasm_deltalog_gistic.tsv")
+drivers = drivers[grepl("gist", dataset)]
+
+# Set N per cohort
+disc_n = 51
+val_n = 84
+
+# Select genes that are in putative driver list
+primary = discovery[gene %in% drivers$gene & !grepl("b", sample)]
+discovery = discovery[gene %in% drivers$gene & grepl("b", sample)]
+validation = validation[gene %in% drivers$gene]
+
+# Get counts
+prim_count = primary[, .N, by = .(CNA, gene)]
+disc_count = discovery[, .N, by = .(CNA, gene)]
+val_count = validation[, .N, by = .(CNA, gene)]
+
+# Fill missing genes
+tofill = data.table(gene = c(drivers$gene, drivers$gene),
+                    CNA = c(rep("AMP", length(drivers$gene)), rep("DEL", length(drivers$gene))),
+                    N = 0)
+
+prim_count = rbind(prim_count, tofill)
+disc_count = rbind(disc_count, tofill)
+val_count = rbind(val_count, tofill)
+
+# Unique and sum
+prim_count = prim_count[, .(primary = sum(N) / disc_n), by = .(CNA, gene)]
+disc_count = disc_count[, .(discovery = sum(N) / disc_n), by = .(CNA, gene)]
+val_count = val_count[, .(validation = sum(N) / val_n), by = .(CNA, gene)]
+
+# merge
+counts = merge(disc_count, val_count, id.vars = c("CNA", "gene"))
+counts_inclprim = merge(counts, prim_count, id.vars = c("CNA", "gene"))
+
+# Plot
+plt24 = ggplot(counts, aes(x = discovery, y = validation, color = CNA)) +
+  geom_point(size = 3) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_x_continuous(labels = scales::percent_format()) +
+  scale_color_brewer(palette = "Set1") +
+  labs(y = "Validation", x = "Discovery") +
+  stat_cor(data = counts, aes(x = discovery, y = validation), inherit.aes = F) +
+  geom_smooth(method = "lm", se = F, linetype = 2, color = "red", size = 2)
+
+plt24
+png("./plots/Suppl_fig3d_SCNA_percentage_discovery_vs_validation_drivers.png", width = 8, height = 8, units = "in", res = 200)
+plt24
+dev.off()
+
+
+counts_inclprim_m = melt(counts_inclprim, id.vars = c("CNA", "gene"))
+
+# TCGA
+# Read in each file and get frequency of deletions/amplifications per gene for TCGA dataset
+tcga_files = tcga_files[grepl("luad|lusc", tcga_files)]
+cnas_tcga = lapply(tcga_files, function(file) {
+  x = fread(file)
+  dels = rowSums(x[, 3:ncol(x)] < -1) / (ncol(x) -2)
+  amps = rowSums(x[, 3:ncol(x)] > 1) / (ncol(x) -2)
+  data = data.table(gene = x[[1]], CNA = c(rep("AMP", length(amps)), rep("DEL", length(dels))), frequency = c(amps, dels), subtype = gsub(".*/|-data_CNA.txt", "", file))
+  data = data[gene %in% drivers$gene]
+  return(data)
+})
+
+# Select genes
+cnas_tcga = rbindlist(cnas_tcga)
+
+# Plot without subtype
+cnas_tcga_all = cnas_tcga[, .(tcga = sum(frequency)), by = .(gene, CNA)]
+counts_all = merge(counts_inclprim, cnas_tcga_all, id.vars = c("CNA", "gene"))
+
+counts_all_m = melt(counts_all, id.vars = c("CNA", "gene"))
+# Get factor levels
+totals = counts_all_m[, sum(value), by = gene]
+setorder(totals, -V1)
+
+counts_all_m[, gene := factor(gene, levels = totals$gene)]
+plt25 = ggplot(counts_all_m, aes(x = gene, y = value, fill = variable)) +
+  geom_col(position = "dodge") +
+  scale_fill_npg() +
+  scale_y_continuous(expand = c(0, 0), labels = scales::percent_format()) +
+  labs(y = "Percentage of samples with gene alteration", x = "Gene", fill = "Cohort") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+
+plt25
+png("./plots/fig3c_SCNA_percentage_discovery_vs_TCGA.png", width = 8, height = 8, units = "in", res = 200)
+plt25
+dev.off()
+```
+
+## Mutational analysis (WES)
+
+```{r tumor mutation burden analysis (boxplots), include=TRUE}
+# Read in data
+total = readRDS("./data/WES/full_cohort_non-syn_postfilter_short.rds")
+annot = fread("./data/patient_annotation/full-table_hq_wes.csv")
+capt = fread("./data/WES/S07604514_Covered_wochr.bed", skip = 2, select = 1:3)
+
+# Calculate number of mutations after filtering
+muts = sapply(total, function(x){
+  nrow(x[mutation_type == "SNP"])
+})
+
+TMB = as.data.table(cbind(names(muts), muts))
+
+# Calculate total mb in capt kit
+capt[, width := V3 - V2]
+total_mb = sum(capt$width) / 1e6
+
+# Get TMB
+TMB[, muts := as.numeric(muts) / total_mb]
+
+ggplot(TMB, aes(x = "", y = muts, color = "")) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2) +
+  ylab("TMB") +
+  scale_color_brewer(palette = "Set1") +
+  theme(axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.position = "")
+
+# plot adeno versus squamous
+muts_subtype = merge(TMB, annot[, c(1, 5)], by.x = "V1", by.y = "Filename")
+
+plt26 = ggplot(muts_subtype, aes(x = subtype, y = muts, color = subtype)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2) +
+  ylab("TMB") +
+  stat_compare_means(comparisons = list(c("ADENOCARCINOMA", "SQUAMOUS CELL CARCINOMA")), paired = F) +
+  scale_color_brewer(palette = "Set1") +
+  theme(axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.position = "")
+plt26
+png("./plots/fig4a_TMB_subtype.png", width = 8, height = 8, units = "in", res = 200)
+plt26
+dev.off()
+
+# plot synchronous vs early vs late
+muts_sync = merge(TMB, annot[, c(1, 8)], by.x = "V1", by.y = "Filename")
+muts_sync[, Type_of_metastases := factor(Type_of_metastases, levels = c("synchronous", "early", "late"))]
+
+plt27 = ggplot(muts_sync, aes(x = Type_of_metastases, y = muts, color = Type_of_metastases)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2) +
+  ylab("TMB") +
+  stat_compare_means(comparisons = list(c("synchronous", "early"), c("synchronous", "late"), c("early", "late")), paired = F) +
+  scale_color_brewer(palette = "Set1") +
+  theme(axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.position = "")
+
+plt27
+png("./plots/fig4b_TMB_time_diagnosis.png", width = 12, height = 8, units = "in", res = 200)
+plt27
+dev.off()
+```
+
+```{r mutation burden analysis per sample, include=TRUE}
+# Read in data
+total = readRDS("./data/WES/full_cohort_non-syn_postfilter_short.rds")
+annot = fread("./data/patient_annotation/full-table_hq_wes.csv")
+annot[, Filename := paste0(Filename, "B")]
+capt = fread("./data/WES/S07604514_Covered_wochr.bed", skip = 2, select = 1:3)
+
+# Calculate number of mutations after filtering
+types = c("FRAME_SHIFT_DEL", "FRAME_SHIFT_INS", "MISSENSE", "NONSENSE", "NONSTOP")
+
+# Calculate total mb in capture kit
+mb_capt = sum(capt$V3 - capt$V2) / 1e6
+
+muts = lapply(1:length(total), function(x){
+  # Make data.table from number of mutations per type
+  tbl = as.data.table(table(total[[x]]$mutation_class))
+
+  #check for missing mutations types
+  missing = types[!types %in% tbl$V1]
+  
+  #add missing
+  if(length(missing) > 0) {
+    miss = data.table(V1 = missing, N = 0)
+    tbl = rbind(tbl, miss)
+  }
+  
+  #calculate capture kit length and get mutations/MB
+  tbl[, N := N / mb_capt]
+  setnames(tbl, c("mutation_type", paste0(names(total[x]), "B")))
+  return(tbl)
+})
+
+# Bind the cols and select samples
+tmb = bind_cols(muts)
+tmb = tmb[, c(1, seq(2, length(tmb), by = 2)), with = F]
+totals_sample = colSums(tmb[, 2:ncol(tmb)])
+totals_sample = cbind(as.data.table(totals_sample), names(totals_sample))
+totals_type = rowSums(tmb[, 2:ncol(tmb)])
+names(totals_type) = tmb$mutation_type
+ 
+# Melt and set factor levels
+setnames(tmb, "mutation_type...1", "mutation_type")
+tmb = melt(tmb, id.vars = "mutation_type")
+tmb[, variable := variable]
+tmb[, variable := factor(variable, levels = totals_sample[order(-totals_sample)]$V2)]
+tmb[, mutation_type := factor(mutation_type, levels = names(totals_type[order(totals_type)]))]
+
+# Plot base plot
+plt = ggplot(tmb, aes(x = variable, y = value, fill = mutation_type)) + 
+  geom_bar(position = "stack", stat = "identity") +
+  scale_fill_viridis_d(direction = -1) +
+  labs(y = "Number of mutations / mb",
+       x = "") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+        legend.position = "top")
+
+# get current factor levels and merge with annotation
+samples = merge(totals_sample, annot[, c(1, 5)], by.x = "V2", by.y = "Filename")
+setorder(samples, subtype, -totals_sample)
+samples[, V2 := factor(V2, levels = levels(tmb$variable))]
+
+#plot annotation bar
+annot_plt = ggplot(samples, aes(x = V2, y = 1, fill = subtype)) +
+  geom_bar(stat = "identity",
+           width = 1) +
+  scale_fill_viridis_d(begin = 0.15) +
+  theme_void() +
+  theme(legend.title = element_blank())
+
+plt28 = cowplot::plot_grid(plt, annot_plt, ncol = 1, align = "v", axis = "lr", rel_heights = c(1, 0.05))
+
+plt28
+png("./plots/fig4c_TMB_sample.png", width = 14, height = 8, units = "in", res = 200)
+plt28
+dev.off()
+```
+
+```{r mutational signature analysis, include=TRUE}
+# Load in data
+vcfs = readRDS("./data/WES/full_cohort_Granges_for_mutationalPatterns.rds")
+annot = fread("/mnt/AchTeraD/Documents/Projects/LungCancer/Data/Patientinfo/full-table_hq_wes.csv")
+ref_genome = "BSgenome.Hsapiens.UCSC.hg19"
+
+# Prepare for plotting
+type_occurrences = mut_type_occurrences(vcfs, ref_genome)
+type_occurrences = type_occurrences[, !grepl("C>T$", colnames(type_occurrences))]
+type_occurrences = type_occurrences/rowSums(type_occurrences)
+type_occurrences$sample = rownames(type_occurrences)
+type_occurrences = reshape2::melt(type_occurrences)
+
+# Get factor order
+type_occurrences$variable = factor(type_occurrences$variable, levels = c("C>A", "C>G", "C>T at CpG", "C>T other",
+                                                                         "T>A", "T>C", "T>G"))
+
+plt29 = ggplot(type_occurrences, aes(x = variable, y = value, color = variable)) + 
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2) +
+  scale_color_manual(values = brewer.pal(8, "Set1")[c(1:5, 7:8)]) +
+  labs(x = "",
+       y = "Relative contribution") +
+  theme(legend.position = "",
+        axis.text.x = element_text(angle = 45, hjust = 1))
+
+plt29
+png("./plots/Suppl_fig5a_base_substitutions_distribution.png", width = 12, height = 8, units = "in", res = 200)
+plt29
+dev.off()
+
+# Generate mutation signature heatmap
+mut_mat = mut_matrix(vcf_list = vcfs, ref_genome = ref_genome)
+
+# Cosmic signatures
+cancer_signatures = read.table("https://cancer.sanger.ac.uk/cancergenome/assets/signatures_probabilities.txt",
+                               sep = "\t", header = TRUE)
+
+# Match the order of the mutation types to MutationalPatterns standard
+new_order = match(row.names(mut_mat), cancer_signatures$Somatic.Mutation.Type)
+
+# Reorder cancer signatures dataframe
+cancer_signatures = cancer_signatures[as.vector(new_order),]
+
+# Add trinucletiode changes names as row.names
+row.names(cancer_signatures) = cancer_signatures$Somatic.Mutation.Type
+
+# Keep only 96 contributions of the signatures in matrix
+cancer_signatures = as.matrix(cancer_signatures[,4:33])
+
+# Fit signatures to cosmic signatures
+fit_res = fit_to_signatures(mut_mat, as.matrix(cancer_signatures))
+contribution = t(fit_res$contribution)
+
+#normalize
+contribution_norm = contribution/rowSums(contribution)
+
+# Cluster and get sample order
+hc.sample = hclust(dist(contribution_norm), method =  "complete")
+sample_order = rownames(contribution_norm)[hc.sample$order]
+
+# Melt and set names
+df_melt = as.data.table(reshape2::melt(contribution_norm))
+setnames(df_melt, c("Sample", "Signature", "Contribution"))
+
+df_melt[, Sample := factor(Sample, levels = sample_order)]
+df_melt[, Signature := factor(Signature, levels = colnames(contribution))]
+
+heatmap = ggplot(df_melt, 
+                 aes(x = Signature,
+                     y = Sample, 
+                     fill = Contribution, 
+                     order = Sample)) + 
+  geom_tile(color = "black") + 
+  scale_fill_viridis(begin = 0.2) + 
+  labs(x = NULL, y = NULL) +
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+        panel.grid.major = element_blank())
+
+#plot dendrogram
+dhc = as.dendrogram(hc.sample)
+ddata = dendro_data(dhc, type = "rectangle")
+dendrogram = ggplot(segment(ddata)) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend)) +
+  coord_flip() + 
+  scale_y_reverse(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0.013, 0.013)) +
+  theme_dendro()
+
+#plot annotation bars
+annot[, Filename := factor(Filename, levels = sample_order)]
+annot_plt = ggplot(annot, aes(x = 1, y = Filename, fill = subtype)) +
+  geom_bar(stat = "identity",
+           width = 1) +
+  scale_fill_viridis_d(begin = 0.15) +
+  theme_void()
+
+plt = cowplot::plot_grid(dendrogram, 
+                          annot_plt + theme(legend.position = ""), 
+                          heatmap,
+                          align = "h", rel_widths = c(0.3, 0.01, 1), ncol = 3)
+
+legend = cowplot::get_legend(
+  annot_plt + guides(color = guide_legend(nrow = 1)) +
+    theme(legend.position = "bottom"))
+
+plt30 = cowplot::plot_grid(plt, legend, rel_heights = c(3, 0.2), ncol = 1)
+
+plt30
+png("./plots/Suppl_fig5b_cosmic_signatures_persample.png", width = 12, height = 16, units = "in", res = 200)
+plt30
+dev.off()
+
+
+# Highlight signature 4 and smoking status
+dt_smoking = merge(df_melt[Signature == "Signature.4"], annot, by.x = "Sample", by.y = "Filename")
+
+plt31 = ggplot(dt_smoking, aes(x = Smoking, y = Contribution, color = Smoking)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = .25) +
+  scale_color_npg() +
+  stat_compare_means(comparisons = list(c("Nonsmoker", "Smoker"))) +
+  labs(y = "Relative contribution of signature 4", x = "") +
+  theme(legend.position = "None")
+
+plt31
+png("./plots/Suppl_fig5c_smoking_cosmic_signature.png", width = 8, height = 8, units = "in", res = 200)
+plt31
+dev.off()
+
+```
+
+```{r Plot top mutated genes oncoprint, include=TRUE}
+# Read in data
+total = readRDS("./data/WES/full_cohort_non-syn_postfilter_short.rds")
+annot = fread("./data/patient_annotation/full-table_hq_wes.csv")
+genes = fread("./data/cosmicplus.tsv")
+
+#give sampleid and select columns
+total = lapply(1:length(total), function(x){
+  total[[x]][, sample := names(total[x])]
+  total[[x]][, c("gene", "sample", "mutation_class")]
+})
+
+total = bind_rows(total)
+setnames(total, "mutation_class", "variant_class")
+total = total[gene %in% genes$gene,]
+
+total[grepl("MISSENSE|NONSENSE|NONSTOP", variant_class), variant_class := "non_synonymous_SNV"]
+total[grepl("SHIFT", variant_class), variant_class := "frame_shift_indel"]
+
+#dcast
+mat = dcast(total, gene ~ sample, value.var = "variant_class", fun.aggregate = function(x) paste0(unique(x), collapse = ";"))
+
+#get annotations
+annot = as.data.frame(annot[, c("Filename", "subtype")])
+annot$Filename = factor(annot$Filename, levels = annot$Filename)
+
+#add all samples
+add_cols = as.character(annot$Filename[!annot$Filename %in% colnames(mat)])
+mat[, (add_cols) := ""]
+
+mat = as.data.frame(mat)
+mat[mat == ";"] = ""
+rownames(mat) = mat$gene
+mat$gene = NULL
+
+#melt
+annot = melt(annot, id.vars = "Filename")
+setnames(annot, "Filename", "sample")
+annot_cols = list("subtype" = c("ADENOCARCINOMA" = viridis(2)[1], "SQUAMOUS CELL CARCINOMA" = viridis(2)[2]))
+ha = HeatmapAnnotation(subtype=annot[, 3], col = annot_cols)
+
+#cols = brewer.pal(5, "Set1")
+cols = viridis(2, begin = 0.1, end = 0.6)
+names(cols) = c("non_synonymous_SNV", "frame_shift_indel")
+
+#subset matrix for top genes
+maxgenes = 50
+subs = tail(sort(table(total$gene)), maxgenes)
+mat_subset = mat[names(subs), ]
+
+plt32 = oncoPrint(mat_subset,
+          alter_fun = list(
+            background = alter_graphic("rect", width = 0.9, height = 0.9, fill = "#FFFFFF", col = "black"),
+            non_synonymous_SNV = alter_graphic("rect", width = 0.83, height = 0.83, fill = cols["non_synonymous_SNV"]),
+            frame_shift_indel = alter_graphic("rect", width = 0.83, height = 0.3, fill = cols["frame_shift_indel"])
+          ), col = cols, border = "black", bottom_annotation = ha, show_column_names = T)
+
+plt32
+png("./plots/fig4d_mutated_genes_oncoprint.png", width = 12, height = 18, units = "in", res = 200)
+plt32
+dev.off()
+
+```
+
+
+```{r Plot potential drivers heatmap, include=TRUE}
+# Load in chasm data -- ignore the warning
+data = fread("./data/WES/chasm_allLUADLUSCGBMLGG.tsv", skip = "UID") 
+cosmic = fread("./data/cosmicplus.tsv")
+annot = fread("./data/patient_annotation/full-table_hq_wes.csv", select = c(1, 5))
+
+# Select which model to use
+model = "all"
+
+# Rename dataframe columns
+data = data[, c(8, 10, 14, 18:19, 22:23, 26:27, 30:31, 34:35)]
+
+# Change column names to be easier to handle
+setnames(data, c("gene", "variant_class", "sample", 
+                 "pvalue_chasmplus_all", "score_chasmplus_all", 
+                 "pvalue_chasmplus_GBM", "score_chasmplus_GBM", 
+                 "pvalue_chasmplus_LGG", "score_chasmplus_LGG", 
+                 "pvalue_chasmplus_LUAD", "score_chasmplus_LUAD", 
+                 "pvalue_chasmplus_LUSC", "score_chasmplus_LUSC"))
+
+greps = grepl(paste0("gene|variant_class|sample|", model), colnames(data))
+data = data[, ..greps]
+colnames(data) = gsub(paste0("_chasmplus_|_chasmplus_", model), "", colnames(data))
+
+# Subselect data based on having P-Value and for genes in cosmic
+data = data[!is.na(pvalue)]
+
+# Set pvalue of 0 to 1e-8 because that is the lower bound CHASM used for significance
+data[pvalue == 0, pvalue := 1e-08]
+data[, padj := p.adjust(pvalue, method = "BH")]
+
+# Split rows where there are multiple samples
+data = separate_rows(data, sample, sep = ";", convert = F)
+setDT(data)
+
+# Get gene medians for ordering
+data[, median := median(padj), by = gene]
+setorder(data, median)
+data[, gene := factor(gene, levels = unique(gene))]
+
+# Specify significance threshold
+threshold = 0.05
+
+# Subset data to only rows of putative driver mutations in the selected genes
+dt = data[padj < threshold, c("gene", "sample", "padj")]
+
+# Set variant classes based on significance
+dt[, variant_class := "padj"]
+v_order = c("padj")
+
+# Set annotations
+annot$Filename <- factor(annot$Filename, levels = annot$Filename)
+
+# Remove MN38 and MN22
+annot = annot[!annot$Filename == "MN38",]
+annot = annot[!annot$Filename == "MN22",]
+
+# Melt
+annot = melt(annot, id.vars = "Filename")
+setnames(annot, "Filename", "sample")
+
+# Plot waterfall plot to get sample order
+plt_data <- waterfall(as.data.frame(dt), fileType = "custom", variant_class_order = v_order,
+                 plotSamples = unique(annot$sample), plotMutBurden = F,
+                 mainPalette = viridis(1, direction = -1), mainGrid = T, clinData = annot,
+                 clinVarOrder = c("ADENOCARCINOMA", "SQUAMOUS CELL CARCINOMA"), 
+                 clinVarCol = viridis(2, begin = 0.2), mainDropMut = F, out = "data")
+new_dt = merge(plt_data$main, dt[, 1:3])
+
+plt = ggplot(new_dt, aes(x = sample, y = gene, fill = padj)) +
+  geom_tile() +
+  geom_vline(xintercept = seq(1.5, nlevels(unique(new_dt$sample))), size = .1) +
+  geom_hline(yintercept = seq(1.5, nlevels(unique(new_dt$gene))), size = .1) +
+  scale_fill_viridis(direction = -1, begin = 0.3, end = 0.9) +
+  scale_x_discrete(drop = F) +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+
+# Plot annotation bar
+annot[, sample := factor(sample, levels = levels(new_dt$sample))]
+annot_plt = ggplot(annot, aes(x = sample, y = 1, fill = value)) +
+  geom_bar(stat = "identity",
+           width = 1) +
+  scale_fill_viridis_d(begin = 0.15) +
+  theme_void() +
+  theme(legend.title = element_blank())
+
+# Combine plots
+plt33 = cowplot::plot_grid(plt, annot_plt, ncol = 1, align = "v", rel_heights = c(1, 0.05))
+
+plt33
+png("./plots/fig4e_potential_drivers.png", width = 12, height = 18, units = "in", res = 200)
+plt33
+dev.off()
+```
+
+```{r Plot potential drivers pathway analysis, include=TRUE}
+# Load in genes
+data = fread("./data/WES/chasm_allLUADLUSCGBMLGG.tsv", 
+             skip = "UID", select = c(8, 10, 14, 18:19)) 
+
+# Set names
+setnames(data, c("hugo", "sequence_ontology", "sample", "pvalue", "score"))
+
+# Remove mutations without a score and setorder
+data = data[!is.na(score), ]
+
+# Get adjusted p value
+data[pvalue == 0, pvalue := 1e-08]
+data[, padj := p.adjust(pvalue, method = "BH")]
+
+# Keep entry per gene with highest score for GSEO analysis
+setorder(data, -score)
+# data = data[!duplicated(hugo, fromLast = F)]
+
+# Get geneID
+geneid = bitr(data$hugo, 
+              fromType = "SYMBOL",
+              toType = "ENTREZID",
+              OrgDb = org.Hs.eg.db)
+
+# Merge to get geneid and rank the genelist
+data = merge(data, geneid, by.x = "hugo", by.y = "SYMBOL")
+setorder(data, -score)
+
+# Subset data
+data_subs = data[padj < 0.05, ]
+
+# Get GO enrichment
+ego = enrichGO(gene = data_subs$ENTREZID,
+               OrgDb = org.Hs.eg.db,
+               ont = "CC",
+               pAdjustMethod = "BH",
+               pvalueCutoff = 0.05,
+               qvalueCutoff = 0.05,
+               readable = T)
+plt34 = dotplot(ego, showCategory = 20)
+
+plt34
+png("./plots/Suppl_fig5d_pathway_analysis_drivers.png", width = 16, height = 12, units = "in", res = 200)
+plt34
+dev.off()
+```
+## Gene-panel analysis and comparison to WES
+
+```{r gene panel mutated genes oncoprint, include=TRUE}
+# Load data
+total = fread("./data/gene-panel/filtered_muts_full.tsv")
+annot = fread("./data/patient_annotation/genepanel_sample_annot.txt", header = F)
+bm_annot = fread("./data/patient_annotation/BM_annot.tsv")
+
+# Keep only adeno/squamous
+annot = merge(bm_annot, annot, by.x = "V1", by.y = "V2")
+
+#dcast
+mat = dcast(total, gene ~ sample, value.var = "mutation_class", fun.aggregate = function(x) paste0(unique(x), collapse = ";"))
+
+# Add all samples
+add_cols = annot$V1[!annot$V1 %in% colnames(mat)]
+if(length(add_cols > 0)) mat[, (add_cols) := ""]
+
+# Make dt
+mat = as.data.frame(mat)
+mat[mat == ";"] = ""
+rownames(mat) = mat$gene
+mat$gene = NULL
+
+#melt
+annot_cols = list("subtype" = c("ADENOCARCINOMA" = viridis(2)[1], "SQUAMOUS CELL CARCINOMA" = viridis(2)[2]))
+annot_ha = data.table(sample = colnames(mat))
+annot_ha = merge(annot_ha, annot[, .(V1, V5)], by.x = "sample", by.y = "V1")
+ha = HeatmapAnnotation(subtype=annot_ha$V5, col = annot_cols)
+
+#cols = brewer.pal(5, "Set1")
+cols = viridis(2, begin = 0.1, end = 0.6)
+names(cols) = c("non_synonymous_SNV", "frame_shift_indel")
+
+#subset matrix for top genes
+maxgenes = 50
+subs = tail(sort(table(total$gene)), maxgenes)
+mat_subset = mat[names(subs), ]
+
+plt34 = oncoPrint(mat_subset,
+          alter_fun = list(
+            background = alter_graphic("rect", width = 0.9, height = 0.9, fill = "#FFFFFF", col = "black"),
+            non_synonymous_SNV = alter_graphic("rect", width = 0.83, height = 0.83, fill = cols["non_synonymous_SNV"]),
+            frame_shift_indel = alter_graphic("rect", width = 0.83, height = 0.3, fill = cols["frame_shift_indel"])
+          ), col = cols, border = "black", show_column_names = T, bottom_annotation = ha)
+
+plt34
+png("./plots/Suppl_fig6a_mutated_genes_oncoprint_genepanel.png", width = 18, height = 14, units = "in", res = 200)
+plt34
+dev.off()
+
+```
+
+```{r gene panel comparison to WES, include=TRUE}
+# Load data
+wes_genes = readRDS("./data/WES/full_cohort_non-syn_postfilter_short.rds")
+gene_panel = fread("./data/gene-panel/filtered_muts_full.tsv")
+genes = fread("./data/gene-panel/agilent-glasgow.csv", header = F)
+drivers = fread("./data/putative-drivers_chasm_deltalog_gistic.tsv")
+drivers = drivers[dataset == "chasm", ]
+
+#give sampleid and select columns
+wes_genes = lapply(1:length(wes_genes), function(x){
+  wes_genes[[x]][, sample := names(wes_genes[x])]
+  wes_genes[[x]][, .(sample, `#CHROM`, POS, REF, ALT, mutation_class, gene)]
+})
+
+wes_genes = rbindlist(wes_genes)
+setnames(wes_genes, c("sample", "chr", "pos", "ref", "alt", "mutation_class", "gene"))
+setnames(gene_panel, c("sample", "chr", "pos", "ref", "alt", "depth", "AF", "mutation_type", "mutation_class", "gene"))
+
+# Only keep genes that are present in the gene panel
+wes_genes = wes_genes[gene %in% genes$V1, ]
+gene_panel = gene_panel[gene %in% genes$V1, ]
+
+# Get unique gene lists
+wes_counts = wes_genes[, .N/uniqueN(wes_genes$sample), by = gene]
+panel_counts = gene_panel[, .N/uniqueN(gene_panel$sample), by = gene]
+
+dt = merge(wes_counts, panel_counts, by = "gene")
+
+# Plot
+plt35 = ggplot(dt, aes(x = V1.x, y = V1.y)) +
+  geom_point(size = 2) +
+  labs(y = "Gene panel normalized frequency", x = "WES normalized frequency") +
+  geom_smooth(method = "lm", se = F, linetype = 2, color = "red", size = 1.5) +
+  stat_cor(method = "spearman")
+
+plt35
+png("./plots/Suppl_fig6b_mutated_genes_oncoprint_genepanel.png", width = 8, height = 8, units = "in", res = 200)
+plt35
+dev.off()
+
+
+# Same plot but for drivers
+plt36 = ggplot(dt[gene %in% drivers$gene, ], aes(x = V1.x, y = V1.y)) +
+  geom_point(size = 2) +
+  labs(y = "Gene panel normalized frequency", x = "WES normalized frequency") +
+  geom_smooth(method = "lm", se = F, linetype = 2, color = "red", size = 1.5) +
+  stat_cor(method = "spearman")
+
+plt36
+png("./plots/Suppl_fig6c_mutated_genes_oncoprint_genepanel.png", width = 8, height = 8, units = "in", res = 200)
+plt36
+dev.off()
+
+```
