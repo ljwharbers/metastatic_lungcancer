@@ -953,13 +953,15 @@ mat_genes = dcast(discovery, gene~sample, value.var = "CNA", fun.aggregate = fun
 add_cols = as.character(annot$sample[!annot$sample %in% colnames(mat_genes)])
 mat_genes[, (add_cols) := ""]
 
+# Set sample order
+setcolorder(mat_genes, c('gene', levels(annot$sample)))
+
 #set rownames
 mat_genes = as.data.frame(mat_genes)
 rownames(mat_genes) = mat_genes$gene
 mat_genes$gene = NULL
 
 # combine
-# mat_genes = mat_genes[, colnames(mat)]
 maxgenes = 50
 subs = tail(sort(rowSums(mat_genes == "AMP" | mat_genes == "DEL")), maxgenes)
 mat_genes_subset = mat_genes[names(subs), ]
