@@ -1,4 +1,0 @@
-Building DAG of jobs...
-MissingInputException in line 12 of /mnt/AchTeraD/Documents/Projects/LungCancer/manuscript/repository/preprocessing/WGS_WES/Snakefile:
-Missing input files for rule all:
-/mnt/sequencing/BICRO320/stats/stats.tsv
