@@ -1,0 +1,45 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 32
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	24	aflred_post
+	1	all
+	2	bwa_map_pe
+	2	deduplication
+	1	qc
+	30
+Select jobs to execute...
+
+[Mon Jun 27 15:17:31 2022]
+rule bwa_map_pe:
+    input: /mnt/AchTeraD/Documents/references/hg19/hg19.fa, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1009_S9_R1.fastq.gz, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1009_S9_R2.fastq.gz
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam.bai
+    jobid: 36
+    wildcards: sample=P18754_1009_S9
+    priority: 1
+    threads: 32
+
+bwa mem -M -t 32 -R '@RG\tID:P18754_1009_S9\tSM:P18754_1009_S9\tPL:ILLUMINA' /mnt/AchTeraD/Documents/references/hg19/hg19.fa /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1009_S9_R1.fastq.gz /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1009_S9_R2.fastq.gz | samtools sort -o /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam && samtools index -@ 32 /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam
+[Wed Jun 29 04:15:33 2022]
+Error in rule bwa_map_pe:
+    jobid: 36
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam.bai
+    shell:
+        bwa mem -M -t 32 -R '@RG\tID:P18754_1009_S9\tSM:P18754_1009_S9\tPL:ILLUMINA' /mnt/AchTeraD/Documents/references/hg19/hg19.fa /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1009_S9_R1.fastq.gz /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1009_S9_R2.fastq.gz | samtools sort -o /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam && samtools index -@ 32 /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Job failed, going on with independent jobs.
+Select jobs to execute...
+
+[Wed Jun 29 04:15:33 2022]
+rule bwa_map_pe:
+    input: /mnt/AchTeraD/Documents/references/hg19/hg19.fa, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1015_S12_R1.fastq.gz, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1015_S12_R2.fastq.gz
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.bam.bai
+    jobid: 42
+    wildcards: sample=P18754_1015_S12
+    priority: 1
+    threads: 32
+
+bwa mem -M -t 32 -R '@RG\tID:P18754_1015_S12\tSM:P18754_1015_S12\tPL:ILLUMINA' /mnt/AchTeraD/Documents/references/hg19/hg19.fa /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1015_S12_R1.fastq.gz /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1015_S12_R2.fastq.gz | samtools sort -o /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.bam && samtools index -@ 32 /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.bam

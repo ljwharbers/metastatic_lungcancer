@@ -224,10 +224,11 @@ number_altered = data[, .N, by = .(CNA, sample, subtype, location)]
 
 # Plot
 plt6 = ggplot(percentage_altered, aes(x = location, y = percentage, color = CNA)) +
+  #facet_wrap(~subtype) +
   geom_boxplot(outlier.shape = NA) +
   geom_point(position = position_jitterdodge(jitter.width = .15)) +
   scale_color_brewer(palette = "Set1") +
-  labs(y = "% of genome with SCNAs", x = "", title = "Percentage of genome alterated")
+  labs(y = "% of genome with SCNAs", x = "", title = "Percentage of genome altered")
 
 plt6
 png("./plots/fig1c_percentage_CNAs.png", width = 8, height = 8, units = "in", res = 200)
@@ -235,6 +236,7 @@ plt6
 dev.off()
 
 plt7 = ggplot(number_altered, aes(x = location, y = N, color = CNA)) +
+  #facet_wrap(~subtype) +
   geom_boxplot(outlier.shape = NA) +
   geom_point(position = position_jitterdodge(jitter.width = .15)) +
   scale_color_brewer(palette = "Set1") +
@@ -279,8 +281,8 @@ plt9
 dev.off()
 
 # Show number/percentage of SCNAs in NSCLC vs BM (scatterplot)
-percentage_altered = dcast(percentage_altered, sample ~ location, value.var = "percentage", fun.aggregate = sum)
-number_altered = dcast(number_altered, sample ~ location, value.var = "N", fun.aggregate = sum)
+percentage_altered = dcast(percentage_altered, sample + subtype ~ location, value.var = "percentage", fun.aggregate = sum)
+number_altered = dcast(number_altered, sample + subtype ~ location, value.var = "N", fun.aggregate = sum)
 
 plt10 = ggplot(percentage_altered, aes(x = NSCLC, y = BM)) +
   geom_point() +
@@ -591,6 +593,32 @@ png("./plots/fig1h_Gene_level_SCNAs_oncoprint.png", width = 18, height = 12, uni
 plt17
 dev.off()
 
+# Right side barplot
+mat_typed = mat
+for(x in colnames(mat_typed)) {
+  mat_typed[[x]] = gsub("AMP|DEL", annot$subtype[annot$sample == x], mat_typed[[x]])
+}
+dt_fractions = data.table(gene = rownames(mat_typed), 
+                          fraction_adeno = rowSums(mat_typed == "ADENOCARCINOMA") / sum(annot$subtype == "ADENOCARCINOMA"),
+                          fraction_squamous = rowSums(mat_typed == "SQUAMOUS CELL CARCINOMA") / sum(annot$subtype == "SQUAMOUS CELL CARCINOMA"))
+dt_fractions = melt(dt_fractions)
+
+dt_fractions[, gene := factor(gene, levels = rev(rownames(mat_typed)[row_order(plt17)]))]
+dt_fractions[, variable := factor(variable, levels = c("fraction_squamous", "fraction_adeno"))]
+
+# Plot
+plt17_rightside = ggplot(dt_fractions, aes(x = gene, y = value, fill = variable)) +
+  geom_col() +
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_fill_npg() +
+  labs(x = "", y = "Fraction of samples AMP/DEL") +
+  coord_flip() +
+  theme(axis.ticks.y = element_blank())
+
+plt17_rightside
+png("./plots/fig1h_rightsideannot_Arm_level_SCNAs_oncoprint.png", width = 18, height = 12, units = "in", res = 200)
+plt17_rightside
+dev.off()
 ```
 
 ## Analysis of multi-region CUTseq
@@ -980,6 +1008,34 @@ plt22
 png("./plots/fig3a_CNA_genes_discovery_cohort_oncoprint.png", width = 18, height = 18, units = "in", res = 200)
 plt22
 dev.off()
+
+# Make right side annotation bars
+mat_genes_subset_typed = mat_genes_subset
+for(x in colnames(mat_genes_subset_typed)) {
+  mat_genes_subset_typed[[x]] = gsub("AMP|DEL", annot$subtype[annot$sample == x], mat_genes_subset_typed[[x]])
+}
+dt_fractions = data.table(gene = rownames(mat_genes_subset_typed), 
+                          fraction_adeno = rowSums(mat_genes_subset_typed == "ADENOCARCINOMA") / sum(annot$subtype == "ADENOCARCINOMA"),
+                          fraction_squamous = rowSums(mat_genes_subset_typed == "SQUAMOUS CELL CARCINOMA") / sum(annot$subtype == "SQUAMOUS CELL CARCINOMA"))
+dt_fractions = melt(dt_fractions)
+
+dt_fractions[, gene := factor(gene, levels = rev(rownames(mat_genes_subset_typed)[row_order(plt22)]))]
+dt_fractions[, variable := factor(variable, levels = c("fraction_squamous", "fraction_adeno"))]
+
+# Plot
+plt22_rightside = ggplot(dt_fractions, aes(x = gene, y = value, fill = variable)) +
+  geom_col() +
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_fill_npg() +
+  labs(x = "", y = "Fraction of samples AMP/DEL") +
+  coord_flip() +
+  theme(axis.ticks.y = element_blank())
+
+plt22_rightside
+png("./plots/fig3a_rightsideannot_CNA_genes_discovery_cohort_oncoprint.png", width = 7, height = 18, units = "in", res = 200)
+plt22_rightside
+dev.off()
+
 ```
 
 ```{r gene level analysis of discovery cohort using GISTIC2, include=TRUE}
@@ -1074,7 +1130,191 @@ png("./plots/fig3b_gistic_scores_discoverycohort.png", width = 8, height = 8, un
 plt23
 dev.off()
 ```
+```{r gene level analysis of discovery cohort using GISTIC2 (ADENO), include=TRUE}
+# Load in gene-level GISTIC2 data
+prim_amp = fread("./data/GISTIC2/primary_adeno/amp_genes.conf_90.txt",
+                 drop = 1)
+prim_del = fread("./data/GISTIC2/primary_adeno/del_genes.conf_90.txt",
+                 drop = 1)
+met_amp = fread("./data/GISTIC2/metastasis_adeno/amp_genes.conf_90.txt",
+                 drop = 1)
+met_del = fread("./data/GISTIC2/metastasis_adeno/del_genes.conf_90.txt",
+                 drop = 1)
+cosmicplus = fread("./data/cosmicplus.tsv")
 
+# Notate datasets for looping (only note the gene level ones)
+datasets = c("prim_amp", "prim_del", "met_amp", "met_del")
+
+# Apply through datasets and over columns to get all genes with their respective q values
+tmp = lapply(datasets, function(y){
+  lapply(colnames(get(y)), function(x) {
+    tmp = data.table(get(y)[5:nrow(prim_amp), ..x], get(y)[2, ..x], y)
+    setnames(tmp, c("gene", "qvalue", "variable"))
+    tmp = tmp[grepl(".", tmp$gene),]
+    return(tmp)
+    })
+})
+
+# Bind the nested list of output
+tmp = lapply(1:length(tmp), function(x){
+  rbindlist(tmp[[x]])
+})
+
+# bind the list of previous row_bind and select genes that overlap in cosmicplus genelist
+genes = bind_rows(tmp)
+genes = genes[gene %in% cosmicplus$gene]
+genes[, qvalue := as.numeric(qvalue)]
+
+#get unique genes based on gene+variable (removes duplicated entries where one gene overlaps multiple amp/del peaks)
+genes = unique(genes, by = c("gene", "variable"))
+
+# Split prim/met into columns
+prim = genes[grepl("prim", genes$variable),]
+met = genes[grepl("met", genes$variable),]
+setnames(prim, "qvalue", "qvalue_prim")
+setnames(met, "qvalue", "qvalue_met")
+
+# Remove 'prim' and 'met' from variable
+prim[, variable := gsub("prim_", "", variable)]
+met[, variable := gsub("met_", "", variable)]
+
+# Set values >0.2 to .2
+prim[qvalue_prim > 0.05, qvalue_prim := .2]
+met[qvalue_met > 0.05, qvalue_met := .2]
+
+# merge
+total = merge(prim, met, by = c("gene", "variable"), all = T)
+
+# Set NAs to .2 and set NAs to rows with both '.2'
+total[is.na(total)] = .2
+total[qvalue_prim == .2 & qvalue_met == .2, c("qvalue_prim", "qvalue_met") := NA]
+
+# Transform function
+reverselog_trans = function(base = 10){
+  trans = function(x) -log(x,base)
+  inv = function(x) base^(-x)
+  
+  scales::trans_new(name = "reverselog", transform = trans, inverse = inv,
+                    breaks = scales::log_breaks(base = base),
+                    domain = c(10^(-60),Inf)
+  )}
+# Get min value for limits
+min_val = min(c(min(total$qvalue_prim, na.rm = T), min(total$qvalue_met, na.rm = T)))
+
+breaks = c(.2, 1e-2, 1e-4, 1e-6, 1e-8, 1e-10, 1e-12, 1e-14, 1e-16, 1e-18)
+labels = c("NS", 1e-2, 1e-4, 1e-6, 1e-8, 1e-10, 1e-12, 1e-14, 1e-16, 1e-18)
+
+plt23a = ggplot(total, aes(x = qvalue_prim, y = qvalue_met, labels = gene, color = variable)) +
+  geom_point() +
+  geom_vline(xintercept = 0.05, linetype = 2, color = "red") +
+  geom_hline(yintercept = 0.05, linetype = 2, color = "red") +
+  scale_color_brewer(palette = "Set1") +
+  geom_text_repel(data = total,
+                  label = total$gene) +
+  labs(y = "q-value (M)", x = "q-value (T)") +
+  scale_x_continuous(trans = reverselog_trans(), limits = c(.2, min(min_val)), 
+                     breaks = breaks, labels = labels) +
+  scale_y_continuous(trans = reverselog_trans(), limits = c(.2, min(min_val)),
+                     breaks = breaks, labels = labels)
+
+plt23a
+png("./plots/adeno_gistic_scores_discoverycohort.png", width = 8, height = 8, units = "in", res = 200)
+plt23a
+dev.off()
+```
+
+```{r gene level analysis of discovery cohort using GISTIC2 (SQUAMOUS), include=TRUE}
+# Load in gene-level GISTIC2 data
+prim_amp = fread("./data/GISTIC2/primary_squamous/amp_genes.conf_90.txt",
+                 drop = 1)
+prim_del = fread("./data/GISTIC2/primary_squamous/del_genes.conf_90.txt",
+                 drop = 1)
+met_amp = fread("./data/GISTIC2/metastasis_squamous/amp_genes.conf_90.txt",
+                 drop = 1)
+met_del = fread("./data/GISTIC2/metastasis_squamous/del_genes.conf_90.txt",
+                 drop = 1)
+cosmicplus = fread("./data/cosmicplus.tsv")
+
+# Notate datasets for looping (only note the gene level ones)
+datasets = c("prim_amp", "prim_del", "met_amp", "met_del")
+
+# Apply through datasets and over columns to get all genes with their respective q values
+tmp = lapply(datasets, function(y){
+  lapply(colnames(get(y)), function(x) {
+    tmp = data.table(get(y)[5:nrow(prim_amp), ..x], get(y)[2, ..x], y)
+    setnames(tmp, c("gene", "qvalue", "variable"))
+    tmp = tmp[grepl(".", tmp$gene),]
+    return(tmp)
+    })
+})
+
+# Bind the nested list of output
+tmp = lapply(1:length(tmp), function(x){
+  rbindlist(tmp[[x]])
+})
+
+# bind the list of previous row_bind and select genes that overlap in cosmicplus genelist
+genes = bind_rows(tmp)
+genes = genes[gene %in% cosmicplus$gene]
+genes[, qvalue := as.numeric(qvalue)]
+
+#get unique genes based on gene+variable (removes duplicated entries where one gene overlaps multiple amp/del peaks)
+genes = unique(genes, by = c("gene", "variable"))
+
+# Split prim/met into columns
+prim = genes[grepl("prim", genes$variable),]
+met = genes[grepl("met", genes$variable),]
+setnames(prim, "qvalue", "qvalue_prim")
+setnames(met, "qvalue", "qvalue_met")
+
+# Remove 'prim' and 'met' from variable
+prim[, variable := gsub("prim_", "", variable)]
+met[, variable := gsub("met_", "", variable)]
+
+# Set values >0.2 to .2
+prim[qvalue_prim > 0.05, qvalue_prim := .2]
+met[qvalue_met > 0.05, qvalue_met := .2]
+
+# merge
+total = merge(prim, met, by = c("gene", "variable"), all = T)
+
+# Set NAs to .2 and set NAs to rows with both '.2'
+total[is.na(total)] = .2
+total[qvalue_prim == .2 & qvalue_met == .2, c("qvalue_prim", "qvalue_met") := NA]
+
+# Transform function
+reverselog_trans = function(base = 10){
+  trans = function(x) -log(x,base)
+  inv = function(x) base^(-x)
+  
+  scales::trans_new(name = "reverselog", transform = trans, inverse = inv,
+                    breaks = scales::log_breaks(base = base),
+                    domain = c(10^(-60),Inf)
+  )}
+# Get min value for limits
+min_val = min(c(min(total$qvalue_prim, na.rm = T), min(total$qvalue_met, na.rm = T)))
+
+breaks = c(.2, 1e-2, 1e-4, 1e-6, 1e-8, 1e-10, 1e-12, 1e-14, 1e-16, 1e-18)
+labels = c("NS", 1e-2, 1e-4, 1e-6, 1e-8, 1e-10, 1e-12, 1e-14, 1e-16, 1e-18)
+
+plt23b = ggplot(total, aes(x = qvalue_prim, y = qvalue_met, labels = gene, color = variable)) +
+  geom_point() +
+  geom_vline(xintercept = 0.05, linetype = 2, color = "red") +
+  geom_hline(yintercept = 0.05, linetype = 2, color = "red") +
+  scale_color_brewer(palette = "Set1") +
+  geom_text_repel(data = total,
+                  label = total$gene) +
+  labs(y = "q-value (M)", x = "q-value (T)") +
+  scale_x_continuous(trans = reverselog_trans(), limits = c(.2, min(min_val)), 
+                     breaks = breaks, labels = labels) +
+  scale_y_continuous(trans = reverselog_trans(), limits = c(.2, min(min_val)),
+                     breaks = breaks, labels = labels)
+
+plt23b
+png("./plots/squamous_gistic_scores_discoverycohort.png", width = 8, height = 8, units = "in", res = 200)
+plt23b
+dev.off()
+```
 
 ```{r gene level alteration comparison between discovery and validation cohorts, include=TRUE}
 # Load in all cohorts
@@ -1549,6 +1789,33 @@ plt33 = oncoPrint(mat_subset,
 plt33
 png("./plots/fig4d_mutated_genes_oncoprint.png", width = 12, height = 18, units = "in", res = 200)
 plt33
+dev.off()
+
+# Right side barplot
+mat_subset_typed = mat_subset
+for(x in colnames(mat_subset_typed)) {
+  mat_subset_typed[[x]] = gsub("non_.*|frame.*", annot$value[annot$sample == x], mat_subset_typed[[x]])
+}
+dt_fractions = data.table(gene = rownames(mat_subset_typed), 
+                          fraction_adeno = rowSums(mat_subset_typed == "ADENOCARCINOMA") / sum(annot$value == "ADENOCARCINOMA"),
+                          fraction_squamous = rowSums(mat_subset_typed == "SQUAMOUS CELL CARCINOMA") / sum(annot$value == "SQUAMOUS CELL CARCINOMA"))
+dt_fractions = melt(dt_fractions)
+
+dt_fractions[, gene := factor(gene, levels = rev(rownames(mat_subset_typed)[row_order(plt)]))]
+dt_fractions[, variable := factor(variable, levels = c("fraction_squamous", "fraction_adeno"))]
+
+# Plot
+plt33_rightside = ggplot(dt_fractions, aes(x = gene, y = value, fill = variable)) +
+  geom_col() +
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_fill_npg() +
+  labs(x = "", y = "Fraction of samples AMP/DEL") +
+  coord_flip() +
+  theme(axis.ticks.y = element_blank())
+
+plt33_rightside
+png("./plots/fig4d_rightsideAnnot_mutated_genes_oncoprint.png", width = 7, height = 14, units = "in", res = 200)
+plt33_rightside
 dev.off()
 
 ```

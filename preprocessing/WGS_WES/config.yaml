@@ -1,5 +1,5 @@
-indir: "/mnt/sequencing/Lungcancer/WES/BICRO201/fastq/"
-outdir: "/mnt/sequencing/Lungcancer/WES/BICRO201/"
+indir: "/mnt/sequencing/BICRO329/deep_wgs/fastq/"
+outdir: "/mnt/sequencing/Lungcancer/deep_wgs/"
 method: "pe"
 threads: 38
 ref: "/mnt/AchTeraD/Documents/references/hg19/hg19.fa"

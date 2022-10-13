@@ -1,0 +1,669 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 24
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	40	aflred_post
+	1	all
+	10	deduplication
+	1	qc
+	52
+Select jobs to execute...
+
+[Tue Jul 19 09:51:19 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1040_S39.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1040_S39.dedup.tsv.gz
+    jobid: 57
+    wildcards: sample=P18754_1040_S39
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1040_S39.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1040_S39.dedup.bam
+
+[Tue Jul 19 09:51:19 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1043_S1.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1043_S1.dedup.tsv.gz
+    jobid: 12
+    wildcards: sample=P18754_1043_S1
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1043_S1.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1043_S1.dedup.bam
+
+[Tue Jul 19 09:51:19 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1005_S7.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1005_S7.dedup.tsv.gz
+    jobid: 49
+    wildcards: sample=P18754_1005_S7
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1005_S7.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1005_S7.dedup.bam
+
+[Tue Jul 19 09:51:19 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1028_S26.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1028_S26.dedup.tsv.gz
+    jobid: 34
+    wildcards: sample=P18754_1028_S26
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1028_S26.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1028_S26.dedup.bam
+
+[Tue Jul 19 09:51:19 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1027_S23.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1027_S23.dedup.tsv.gz
+    jobid: 13
+    wildcards: sample=P18754_1027_S23
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1027_S23.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1027_S23.dedup.bam
+
+[Tue Jul 19 09:51:19 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1037_S33.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1037_S33.dedup.tsv.gz
+    jobid: 28
+    wildcards: sample=P18754_1037_S33
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1037_S33.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1037_S33.dedup.bam
+
+[Tue Jul 19 09:51:19 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1048_S6.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1048_S6.dedup.tsv.gz
+    jobid: 35
+    wildcards: sample=P18754_1048_S6
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1048_S6.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1048_S6.dedup.bam
+
+[Tue Jul 19 09:51:19 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1013_S16.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1013_S16.dedup.tsv.gz
+    jobid: 58
+    wildcards: sample=P18754_1013_S16
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1013_S16.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1013_S16.dedup.bam
+
+[Tue Jul 19 09:51:19 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1035_S42.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1035_S42.dedup.tsv.gz
+    jobid: 73
+    wildcards: sample=P18754_1035_S42
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1035_S42.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1035_S42.dedup.bam
+
+[Tue Jul 19 09:51:19 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1061_S19.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1061_S19.dedup.tsv.gz
+    jobid: 36
+    wildcards: sample=P18754_1061_S19
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1061_S19.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1061_S19.dedup.bam
+
+[Tue Jul 19 09:51:19 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1038_S36.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1038_S36.dedup.tsv.gz
+    jobid: 51
+    wildcards: sample=P18754_1038_S36
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1038_S36.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1038_S36.dedup.bam
+
+[Tue Jul 19 09:51:19 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1059_S17.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1059_S17.dedup.tsv.gz
+    jobid: 59
+    wildcards: sample=P18754_1059_S17
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1059_S17.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1059_S17.dedup.bam
+
+[Tue Jul 19 09:51:19 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1053_S11.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1053_S11.dedup.tsv.gz
+    jobid: 15
+    wildcards: sample=P18754_1053_S11
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1053_S11.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1053_S11.dedup.bam
+
+[Tue Jul 19 09:51:20 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1016_S19.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1016_S19.dedup.tsv.gz
+    jobid: 46
+    wildcards: sample=P18754_1016_S19
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1016_S19.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1016_S19.dedup.bam
+
+[Tue Jul 19 09:51:20 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1055_S13.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1055_S13.dedup.tsv.gz
+    jobid: 68
+    wildcards: sample=P18754_1055_S13
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1055_S13.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1055_S13.dedup.bam
+
+[Tue Jul 19 09:51:20 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1019_S18.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1019_S18.dedup.tsv.gz
+    jobid: 24
+    wildcards: sample=P18754_1019_S18
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1019_S18.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1019_S18.dedup.bam
+
+[Tue Jul 19 09:51:20 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1044_S2.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1044_S2.dedup.tsv.gz
+    jobid: 32
+    wildcards: sample=P18754_1044_S2
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1044_S2.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1044_S2.dedup.bam
+
+[Tue Jul 19 09:51:20 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1004_S1.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1004_S1.dedup.tsv.gz
+    jobid: 54
+    wildcards: sample=P18754_1004_S1
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1004_S1.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1004_S1.dedup.bam
+
+[Tue Jul 19 09:51:20 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1020_S21.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1020_S21.dedup.tsv.gz
+    jobid: 62
+    wildcards: sample=P18754_1020_S21
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1020_S21.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1020_S21.dedup.bam
+
+[Tue Jul 19 09:51:20 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1045_S3.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1045_S3.dedup.tsv.gz
+    jobid: 18
+    wildcards: sample=P18754_1045_S3
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1045_S3.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1045_S3.dedup.bam
+
+[Tue Jul 19 09:51:20 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1042_S38.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1042_S38.dedup.tsv.gz
+    jobid: 55
+    wildcards: sample=P18754_1042_S38
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1042_S38.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1042_S38.dedup.bam
+
+[Tue Jul 19 09:51:20 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1022_S17.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1022_S17.dedup.tsv.gz
+    jobid: 70
+    wildcards: sample=P18754_1022_S17
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1022_S17.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1022_S17.dedup.bam
+
+[Tue Jul 19 09:51:20 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1032_S28.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1032_S28.dedup.tsv.gz
+    jobid: 26
+    wildcards: sample=P18754_1032_S28
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1032_S28.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1032_S28.dedup.bam
+
+[Tue Jul 19 09:51:20 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1039_S34.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1039_S34.dedup.tsv.gz
+    jobid: 71
+    wildcards: sample=P18754_1039_S34
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1039_S34.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1039_S34.dedup.bam
+[Tue Jul 19 12:10:36 2022]
+Finished job 46.
+1 of 52 steps (2%) done
+[Tue Jul 19 14:54:42 2022]
+Finished job 49.
+2 of 52 steps (4%) done
+[Tue Jul 19 16:39:51 2022]
+Finished job 18.
+3 of 52 steps (6%) done
+[Tue Jul 19 17:27:25 2022]
+Finished job 32.
+4 of 52 steps (8%) done
+[Tue Jul 19 17:30:33 2022]
+Finished job 73.
+5 of 52 steps (10%) done
+[Tue Jul 19 18:07:40 2022]
+Finished job 24.
+6 of 52 steps (12%) done
+[Tue Jul 19 18:34:02 2022]
+Finished job 59.
+7 of 52 steps (13%) done
+[Tue Jul 19 19:21:36 2022]
+Finished job 54.
+8 of 52 steps (15%) done
+[Tue Jul 19 19:24:29 2022]
+Finished job 13.
+9 of 52 steps (17%) done
+[Tue Jul 19 19:42:18 2022]
+Finished job 70.
+10 of 52 steps (19%) done
+[Tue Jul 19 19:48:20 2022]
+Finished job 57.
+11 of 52 steps (21%) done
+[Tue Jul 19 19:57:37 2022]
+Finished job 68.
+12 of 52 steps (23%) done
+[Tue Jul 19 20:01:30 2022]
+Finished job 62.
+13 of 52 steps (25%) done
+[Tue Jul 19 20:09:21 2022]
+Finished job 36.
+14 of 52 steps (27%) done
+[Tue Jul 19 20:16:31 2022]
+Finished job 28.
+15 of 52 steps (29%) done
+[Tue Jul 19 20:17:58 2022]
+Finished job 55.
+16 of 52 steps (31%) done
+[Tue Jul 19 20:28:42 2022]
+Finished job 15.
+17 of 52 steps (33%) done
+[Tue Jul 19 20:39:15 2022]
+Finished job 34.
+18 of 52 steps (35%) done
+[Tue Jul 19 20:50:51 2022]
+Finished job 71.
+19 of 52 steps (37%) done
+[Tue Jul 19 21:15:11 2022]
+Finished job 26.
+20 of 52 steps (38%) done
+[Tue Jul 19 21:23:04 2022]
+Finished job 12.
+21 of 52 steps (40%) done
+[Tue Jul 19 21:30:04 2022]
+Finished job 58.
+22 of 52 steps (42%) done
+[Tue Jul 19 21:37:49 2022]
+Finished job 51.
+23 of 52 steps (44%) done
+[Tue Jul 19 21:40:37 2022]
+Finished job 35.
+24 of 52 steps (46%) done
+Select jobs to execute...
+
+[Tue Jul 19 21:40:37 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1047_S5.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1047_S5.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1047_S5.metrics.txt
+    jobid: 4
+    wildcards: sample=P18754_1047_S5
+    threads: 6
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1047_S5.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1047_S5.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1047_S5.metrics.txt
+
+[Tue Jul 19 21:40:37 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1006_S3.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1006_S3.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1006_S3.metrics.txt
+    jobid: 7
+    wildcards: sample=P18754_1006_S3
+    threads: 6
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1006_S3.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1006_S3.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1006_S3.metrics.txt
+
+[Tue Jul 19 21:40:37 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1024_S27.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1024_S27.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1024_S27.metrics.txt
+    jobid: 2
+    wildcards: sample=P18754_1024_S27
+    threads: 6
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1024_S27.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1024_S27.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1024_S27.metrics.txt
+
+[Tue Jul 19 21:40:37 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1023_S25.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1023_S25.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1023_S25.metrics.txt
+    jobid: 3
+    wildcards: sample=P18754_1023_S25
+    threads: 6
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1023_S25.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1023_S25.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1023_S25.metrics.txt
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1006_S3.dedup.bam.
+[Wed Jul 20 01:21:27 2022]
+Finished job 7.
+25 of 52 steps (48%) done
+Select jobs to execute...
+
+[Wed Jul 20 01:21:27 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1051_S9.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1051_S9.dedup.tsv.gz
+    jobid: 61
+    wildcards: sample=P18754_1051_S9
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1051_S9.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1051_S9.dedup.bam
+
+[Wed Jul 20 01:21:27 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1062_S20.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1062_S20.dedup.tsv.gz
+    jobid: 16
+    wildcards: sample=P18754_1062_S20
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1062_S20.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1062_S20.dedup.bam
+
+[Wed Jul 20 01:21:27 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1029_S24.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1029_S24.dedup.tsv.gz
+    jobid: 19
+    wildcards: sample=P18754_1029_S24
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1029_S24.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1029_S24.dedup.bam
+
+[Wed Jul 20 01:21:27 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1006_S3.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1006_S3.dedup.tsv.gz
+    jobid: 50
+    wildcards: sample=P18754_1006_S3
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1006_S3.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1006_S3.dedup.bam
+
+[Wed Jul 20 01:21:27 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1041_S40.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1041_S40.dedup.tsv.gz
+    jobid: 52
+    wildcards: sample=P18754_1041_S40
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1041_S40.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1041_S40.dedup.bam
+
+[Wed Jul 20 01:21:27 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1011_S5.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1011_S5.dedup.tsv.gz
+    jobid: 60
+    wildcards: sample=P18754_1011_S5
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1011_S5.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1011_S5.dedup.bam
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1023_S25.dedup.bam.
+[Wed Jul 20 02:04:18 2022]
+Finished job 3.
+26 of 52 steps (50%) done
+Select jobs to execute...
+
+[Wed Jul 20 02:04:18 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1007_S2.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1007_S2.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1007_S2.metrics.txt
+    jobid: 5
+    wildcards: sample=P18754_1007_S2
+    threads: 6
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1007_S2.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1007_S2.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1007_S2.metrics.txt
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1047_S5.dedup.bam.
+[Wed Jul 20 02:12:52 2022]
+Finished job 4.
+27 of 52 steps (52%) done
+Select jobs to execute...
+
+[Wed Jul 20 02:12:52 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1058_S16.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1058_S16.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1058_S16.metrics.txt
+    jobid: 1
+    wildcards: sample=P18754_1058_S16
+    threads: 6
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1058_S16.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1058_S16.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1058_S16.metrics.txt
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1024_S27.dedup.bam.
+[Wed Jul 20 02:20:32 2022]
+Finished job 2.
+28 of 52 steps (54%) done
+Select jobs to execute...
+
+[Wed Jul 20 02:20:32 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1049_S7.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1049_S7.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1049_S7.metrics.txt
+    jobid: 10
+    wildcards: sample=P18754_1049_S7
+    threads: 6
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1049_S7.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1049_S7.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1049_S7.metrics.txt
+[Wed Jul 20 02:42:54 2022]
+Finished job 60.
+29 of 52 steps (56%) done
+[Wed Jul 20 02:45:50 2022]
+Finished job 61.
+30 of 52 steps (58%) done
+[Wed Jul 20 04:29:36 2022]
+Finished job 50.
+31 of 52 steps (60%) done
+[Wed Jul 20 04:33:41 2022]
+Finished job 19.
+32 of 52 steps (62%) done
+[Wed Jul 20 04:41:51 2022]
+Finished job 52.
+33 of 52 steps (63%) done
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1058_S16.dedup.bam.
+[Wed Jul 20 05:43:27 2022]
+Finished job 1.
+34 of 52 steps (65%) done
+Select jobs to execute...
+
+[Wed Jul 20 05:43:27 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1058_S16.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1058_S16.dedup.tsv.gz
+    jobid: 14
+    wildcards: sample=P18754_1058_S16
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1058_S16.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1058_S16.dedup.bam
+
+[Wed Jul 20 05:43:27 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1023_S25.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1023_S25.dedup.tsv.gz
+    jobid: 27
+    wildcards: sample=P18754_1023_S25
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1023_S25.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1023_S25.dedup.bam
+
+[Wed Jul 20 05:43:27 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1024_S27.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1024_S27.dedup.tsv.gz
+    jobid: 17
+    wildcards: sample=P18754_1024_S27
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1024_S27.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1024_S27.dedup.bam
+
+[Wed Jul 20 05:43:27 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1009_S9.metrics.txt
+    jobid: 8
+    wildcards: sample=P18754_1009_S9
+    threads: 6
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1009_S9.metrics.txt
+
+[Wed Jul 20 05:43:27 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1018_S13.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1018_S13.dedup.tsv.gz
+    jobid: 67
+    wildcards: sample=P18754_1018_S13
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1018_S13.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1018_S13.dedup.bam
+
+[Wed Jul 20 05:43:27 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1047_S5.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1047_S5.dedup.tsv.gz
+    jobid: 30
+    wildcards: sample=P18754_1047_S5
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1047_S5.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1047_S5.dedup.bam
+[Wed Jul 20 07:15:54 2022]
+Finished job 67.
+35 of 52 steps (67%) done
+[Wed Jul 20 07:32:37 2022]
+Finished job 16.
+36 of 52 steps (69%) done
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1049_S7.dedup.bam.
+[Wed Jul 20 08:13:07 2022]
+Finished job 10.
+37 of 52 steps (71%) done
+Select jobs to execute...
+
+[Wed Jul 20 08:13:08 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1015_S12.metrics.txt
+    jobid: 9
+    wildcards: sample=P18754_1015_S12
+    threads: 6
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1015_S12.metrics.txt
+
+[Wed Jul 20 08:13:08 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1049_S7.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1049_S7.dedup.tsv.gz
+    jobid: 72
+    wildcards: sample=P18754_1049_S7
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1049_S7.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1049_S7.dedup.bam
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1007_S2.dedup.bam.
+[Wed Jul 20 08:55:14 2022]
+Finished job 5.
+38 of 52 steps (73%) done
+Select jobs to execute...
+
+[Wed Jul 20 08:55:14 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1007_S2.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1007_S2.dedup.tsv.gz
+    jobid: 44
+    wildcards: sample=P18754_1007_S2
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1007_S2.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1007_S2.dedup.bam
+
+[Wed Jul 20 08:55:14 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1036_S41.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1036_S41.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1036_S41.metrics.txt
+    jobid: 6
+    wildcards: sample=P18754_1036_S41
+    threads: 6
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1036_S41.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1036_S41.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1036_S41.metrics.txt
+[Wed Jul 20 09:03:06 2022]
+Finished job 14.
+39 of 52 steps (75%) done
+[Wed Jul 20 09:22:20 2022]
+Finished job 17.
+40 of 52 steps (77%) done
+[Wed Jul 20 09:35:00 2022]
+Finished job 30.
+41 of 52 steps (79%) done
+[Wed Jul 20 09:41:16 2022]
+Finished job 27.
+42 of 52 steps (81%) done
+[Wed Jul 20 11:04:59 2022]
+Finished job 72.
+43 of 52 steps (83%) done
+[Wed Jul 20 11:47:59 2022]
+Finished job 44.
+44 of 52 steps (85%) done
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1036_S41.dedup.bam.
+[Wed Jul 20 13:07:49 2022]
+Finished job 6.
+45 of 52 steps (87%) done
+Select jobs to execute...
+
+[Wed Jul 20 13:07:50 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1036_S41.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1036_S41.dedup.tsv.gz
+    jobid: 47
+    wildcards: sample=P18754_1036_S41
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1036_S41.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1036_S41.dedup.bam
+[Wed Jul 20 14:48:33 2022]
+Finished job 47.
+46 of 52 steps (88%) done
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.dedup.bam.
+[Wed Jul 20 18:53:07 2022]
+Finished job 8.
+47 of 52 steps (90%) done
+Select jobs to execute...
+
+[Wed Jul 20 18:53:08 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1009_S9.dedup.tsv.gz
+    jobid: 53
+    wildcards: sample=P18754_1009_S9
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1009_S9.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.dedup.bam
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.dedup.bam.
+[Wed Jul 20 20:06:44 2022]
+Finished job 9.
+48 of 52 steps (92%) done
+Select jobs to execute...
+
+[Wed Jul 20 20:06:44 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1015_S12.dedup.tsv.gz
+    jobid: 64
+    wildcards: sample=P18754_1015_S12
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1015_S12.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.dedup.bam
+[Wed Jul 20 22:56:23 2022]
+Finished job 53.
+49 of 52 steps (94%) done
+[Thu Jul 21 01:22:04 2022]
+Finished job 64.
+50 of 52 steps (96%) done
+Select jobs to execute...
+
+[Thu Jul 21 01:22:04 2022]
+rule qc:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1043_S1.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1027_S23.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1058_S16.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1053_S11.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1062_S20.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1024_S27.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1045_S3.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1029_S24.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1033_S35.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1046_S4.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1050_S8.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1008_S6.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1019_S18.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1025_S32.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1032_S28.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1023_S25.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1037_S33.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1012_S14.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1047_S5.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1010_S8.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1044_S2.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1056_S14.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1028_S26.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1048_S6.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1061_S19.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1034_S37.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1030_S29.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1001_S4.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1021_S20.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1003_S10.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1002_S11.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1031_S30.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1007_S2.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1026_S31.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1016_S19.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1036_S41.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1057_S15.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1005_S7.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1006_S3.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1038_S36.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1041_S40.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1009_S9.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1004_S1.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1042_S38.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1014_S22.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1040_S39.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1013_S16.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1059_S17.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1011_S5.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1051_S9.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1020_S21.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1060_S18.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1015_S12.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1017_S15.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1052_S10.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1018_S13.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1055_S13.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1054_S12.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1022_S17.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1039_S34.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1049_S7.dedup.tsv.gz, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1035_S42.dedup.tsv.gz
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/stats.tsv
+    jobid: 11
+
+
+        zgrep ^ME /mnt/sequencing/Lungcancer/deep_wgs/stats/*dedup.tsv.gz | cut -f 2- | \
+        sed -n '1p;0~2p' > /mnt/sequencing/Lungcancer/deep_wgs/stats/stats.tsv
+        
+[Thu Jul 21 01:22:11 2022]
+Finished job 11.
+51 of 52 steps (98%) done
+Select jobs to execute...
+
+[Thu Jul 21 01:22:11 2022]
+localrule all:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1043_S1.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1027_S23.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1058_S16.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1053_S11.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1062_S20.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1024_S27.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1045_S3.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1029_S24.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1033_S35.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1046_S4.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1050_S8.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1008_S6.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1019_S18.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1025_S32.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1032_S28.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1023_S25.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1037_S33.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1012_S14.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1047_S5.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1010_S8.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1044_S2.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1056_S14.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1028_S26.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1048_S6.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1061_S19.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1034_S37.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1030_S29.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1001_S4.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1021_S20.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1003_S10.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1002_S11.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1031_S30.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1007_S2.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1026_S31.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1016_S19.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1036_S41.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1057_S15.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1005_S7.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1006_S3.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1038_S36.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1041_S40.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1004_S1.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1042_S38.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1014_S22.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1040_S39.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1013_S16.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1059_S17.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1011_S5.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1051_S9.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1020_S21.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1060_S18.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1017_S15.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1052_S10.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1018_S13.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1055_S13.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1054_S12.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1022_S17.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1039_S34.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1049_S7.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1035_S42.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/stats.tsv
+    jobid: 0
+
+[Thu Jul 21 01:22:11 2022]
+Finished job 0.
+52 of 52 steps (100%) done
+Complete log: /mnt/AchTeraD/Documents/Projects/LungCancer/manuscript/repository/preprocessing/WGS_WES/.snakemake/log/2022-07-19T095119.749775.snakemake.log

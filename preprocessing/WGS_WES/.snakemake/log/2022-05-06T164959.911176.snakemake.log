@@ -1,0 +1,604 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 36
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	62	aflred_post
+	1	all
+	62	bwa_map_pe
+	62	deduplication
+	1	qc
+	188
+Select jobs to execute...
+
+[Fri May  6 16:50:00 2022]
+rule bwa_map_pe:
+    input: /mnt/AchTeraD/Documents/references/hg19/hg19.fa, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1061_S19_R1.fastq.gz, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1061_S19_R2.fastq.gz
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1061_S19.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1061_S19.bam.bai
+    jobid: 50
+    wildcards: sample=P18754_1061_S19
+    threads: 36
+
+bwa mem -M -t 36 -R '@RG\tID:P18754_1061_S19\tSM:P18754_1061_S19\tPL:ILLUMINA' /mnt/AchTeraD/Documents/references/hg19/hg19.fa /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1061_S19_R1.fastq.gz /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1061_S19_R2.fastq.gz | samtools sort -o /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1061_S19.bam && samtools index -@ 36 /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1061_S19.bam
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1061_S19.bam.bai.
+[Fri May  6 22:11:27 2022]
+Finished job 50.
+1 of 188 steps (0.53%) done
+Select jobs to execute...
+
+[Fri May  6 22:11:27 2022]
+rule bwa_map_pe:
+    input: /mnt/AchTeraD/Documents/references/hg19/hg19.fa, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1038_S36_R1.fastq.gz, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1038_S36_R2.fastq.gz
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1038_S36.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1038_S36.bam.bai
+    jobid: 80
+    wildcards: sample=P18754_1038_S36
+    threads: 36
+
+bwa mem -M -t 36 -R '@RG\tID:P18754_1038_S36\tSM:P18754_1038_S36\tPL:ILLUMINA' /mnt/AchTeraD/Documents/references/hg19/hg19.fa /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1038_S36_R1.fastq.gz /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1038_S36_R2.fastq.gz | samtools sort -o /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1038_S36.bam && samtools index -@ 36 /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1038_S36.bam
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1038_S36.bam.bai.
+[Sat May  7 06:22:05 2022]
+Finished job 80.
+2 of 188 steps (1%) done
+Select jobs to execute...
+
+[Sat May  7 06:22:05 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1038_S36.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1038_S36.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1038_S36.metrics.txt
+    jobid: 79
+    wildcards: sample=P18754_1038_S36
+    threads: 4
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1038_S36.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1038_S36.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1038_S36.metrics.txt
+
+[Sat May  7 06:22:05 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1061_S19.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1061_S19.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1061_S19.metrics.txt
+    jobid: 49
+    wildcards: sample=P18754_1061_S19
+    threads: 4
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1061_S19.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1061_S19.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1061_S19.metrics.txt
+[Sat May  7 07:37:29 2022]
+Error in rule deduplication:
+    jobid: 49
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1061_S19.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1061_S19.metrics.txt
+    shell:
+        gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1061_S19.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1061_S19.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1061_S19.metrics.txt
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Job failed, going on with independent jobs.
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver.
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1038_S36.dedup.bam.
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1038_S36.bam.
+[Sat May  7 09:51:20 2022]
+Finished job 79.
+3 of 188 steps (2%) done
+Select jobs to execute...
+
+[Sat May  7 09:51:20 2022]
+rule bwa_map_pe:
+    input: /mnt/AchTeraD/Documents/references/hg19/hg19.fa, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1029_S24_R1.fastq.gz, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1029_S24_R2.fastq.gz
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1029_S24.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1029_S24.bam.bai
+    jobid: 16
+    wildcards: sample=P18754_1029_S24
+    threads: 36
+
+bwa mem -M -t 36 -R '@RG\tID:P18754_1029_S24\tSM:P18754_1029_S24\tPL:ILLUMINA' /mnt/AchTeraD/Documents/references/hg19/hg19.fa /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1029_S24_R1.fastq.gz /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1029_S24_R2.fastq.gz | samtools sort -o /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1029_S24.bam && samtools index -@ 36 /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1029_S24.bam
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1029_S24.bam.bai.
+[Sat May  7 21:29:41 2022]
+Finished job 16.
+4 of 188 steps (2%) done
+Select jobs to execute...
+
+[Sat May  7 21:29:42 2022]
+rule bwa_map_pe:
+    input: /mnt/AchTeraD/Documents/references/hg19/hg19.fa, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1011_S5_R1.fastq.gz, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1011_S5_R2.fastq.gz
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1011_S5.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1011_S5.bam.bai
+    jobid: 98
+    wildcards: sample=P18754_1011_S5
+    threads: 36
+
+bwa mem -M -t 36 -R '@RG\tID:P18754_1011_S5\tSM:P18754_1011_S5\tPL:ILLUMINA' /mnt/AchTeraD/Documents/references/hg19/hg19.fa /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1011_S5_R1.fastq.gz /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1011_S5_R2.fastq.gz | samtools sort -o /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1011_S5.bam && samtools index -@ 36 /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1011_S5.bam
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1011_S5.bam.bai.
+[Sun May  8 01:06:40 2022]
+Finished job 98.
+5 of 188 steps (3%) done
+Select jobs to execute...
+
+[Sun May  8 01:06:40 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1029_S24.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1029_S24.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1029_S24.metrics.txt
+    jobid: 15
+    wildcards: sample=P18754_1029_S24
+    threads: 4
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1029_S24.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1029_S24.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1029_S24.metrics.txt
+
+[Sun May  8 01:06:40 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1038_S36.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1038_S36.dedup.tsv.gz
+    jobid: 165
+    wildcards: sample=P18754_1038_S36
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1038_S36.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1038_S36.dedup.bam
+
+[Sun May  8 01:06:40 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1011_S5.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1011_S5.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1011_S5.metrics.txt
+    jobid: 97
+    wildcards: sample=P18754_1011_S5
+    threads: 4
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1011_S5.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1011_S5.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1011_S5.metrics.txt
+[Sun May  8 01:06:40 2022]
+Error in rule aflred_post:
+    jobid: 165
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1038_S36.dedup.tsv.gz
+    shell:
+        /home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1038_S36.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1038_S36.dedup.bam
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Job failed, going on with independent jobs.
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver.
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1011_S5.dedup.bam.
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1011_S5.bam.
+[Sun May  8 02:10:59 2022]
+Finished job 97.
+6 of 188 steps (3%) done
+Select jobs to execute...
+
+[Sun May  8 02:10:59 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1011_S5.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1011_S5.dedup.tsv.gz
+    jobid: 174
+    wildcards: sample=P18754_1011_S5
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1011_S5.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1011_S5.dedup.bam
+[Sun May  8 02:10:59 2022]
+Error in rule aflred_post:
+    jobid: 174
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1011_S5.dedup.tsv.gz
+    shell:
+        /home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1011_S5.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1011_S5.dedup.bam
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Job failed, going on with independent jobs.
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver.
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1029_S24.dedup.bam.
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1029_S24.bam.
+[Sun May  8 04:01:51 2022]
+Finished job 15.
+7 of 188 steps (4%) done
+Select jobs to execute...
+
+[Sun May  8 04:01:51 2022]
+rule bwa_map_pe:
+    input: /mnt/AchTeraD/Documents/references/hg19/hg19.fa, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1035_S42_R1.fastq.gz, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1035_S42_R2.fastq.gz
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1035_S42.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1035_S42.bam.bai
+    jobid: 124
+    wildcards: sample=P18754_1035_S42
+    threads: 36
+
+bwa mem -M -t 36 -R '@RG\tID:P18754_1035_S42\tSM:P18754_1035_S42\tPL:ILLUMINA' /mnt/AchTeraD/Documents/references/hg19/hg19.fa /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1035_S42_R1.fastq.gz /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1035_S42_R2.fastq.gz | samtools sort -o /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1035_S42.bam && samtools index -@ 36 /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1035_S42.bam
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1035_S42.bam.bai.
+[Sun May  8 10:14:10 2022]
+Finished job 124.
+8 of 188 steps (4%) done
+Select jobs to execute...
+
+[Sun May  8 10:14:10 2022]
+rule bwa_map_pe:
+    input: /mnt/AchTeraD/Documents/references/hg19/hg19.fa, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1032_S28_R1.fastq.gz, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1032_S28_R2.fastq.gz
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1032_S28.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1032_S28.bam.bai
+    jobid: 30
+    wildcards: sample=P18754_1032_S28
+    threads: 36
+
+bwa mem -M -t 36 -R '@RG\tID:P18754_1032_S28\tSM:P18754_1032_S28\tPL:ILLUMINA' /mnt/AchTeraD/Documents/references/hg19/hg19.fa /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1032_S28_R1.fastq.gz /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1032_S28_R2.fastq.gz | samtools sort -o /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1032_S28.bam && samtools index -@ 36 /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1032_S28.bam
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1032_S28.bam.bai.
+[Sun May  8 21:47:23 2022]
+Finished job 30.
+9 of 188 steps (5%) done
+Select jobs to execute...
+
+[Sun May  8 21:47:23 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1035_S42.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1035_S42.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1035_S42.metrics.txt
+    jobid: 123
+    wildcards: sample=P18754_1035_S42
+    threads: 4
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1035_S42.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1035_S42.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1035_S42.metrics.txt
+
+[Sun May  8 21:47:23 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1029_S24.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1029_S24.dedup.tsv.gz
+    jobid: 133
+    wildcards: sample=P18754_1029_S24
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1029_S24.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1029_S24.dedup.bam
+
+[Sun May  8 21:47:23 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1032_S28.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1032_S28.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1032_S28.metrics.txt
+    jobid: 29
+    wildcards: sample=P18754_1032_S28
+    threads: 4
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1032_S28.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1032_S28.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1032_S28.metrics.txt
+[Sun May  8 21:47:23 2022]
+Error in rule aflred_post:
+    jobid: 133
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1029_S24.dedup.tsv.gz
+    shell:
+        /home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1029_S24.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1029_S24.dedup.bam
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Job failed, going on with independent jobs.
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver.
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1035_S42.dedup.bam.
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1035_S42.bam.
+[Sun May  8 23:30:08 2022]
+Finished job 123.
+10 of 188 steps (5%) done
+Select jobs to execute...
+
+[Sun May  8 23:30:09 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1035_S42.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1035_S42.dedup.tsv.gz
+    jobid: 187
+    wildcards: sample=P18754_1035_S42
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1035_S42.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1035_S42.dedup.bam
+[Sun May  8 23:30:09 2022]
+Error in rule aflred_post:
+    jobid: 187
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1035_S42.dedup.tsv.gz
+    shell:
+        /home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1035_S42.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1035_S42.dedup.bam
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Job failed, going on with independent jobs.
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver.
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1032_S28.dedup.bam.
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1032_S28.bam.
+[Mon May  9 01:06:54 2022]
+Finished job 29.
+11 of 188 steps (6%) done
+Select jobs to execute...
+
+[Mon May  9 01:06:54 2022]
+rule bwa_map_pe:
+    input: /mnt/AchTeraD/Documents/references/hg19/hg19.fa, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1055_S13_R1.fastq.gz, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1055_S13_R2.fastq.gz
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1055_S13.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1055_S13.bam.bai
+    jobid: 114
+    wildcards: sample=P18754_1055_S13
+    threads: 36
+
+bwa mem -M -t 36 -R '@RG\tID:P18754_1055_S13\tSM:P18754_1055_S13\tPL:ILLUMINA' /mnt/AchTeraD/Documents/references/hg19/hg19.fa /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1055_S13_R1.fastq.gz /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1055_S13_R2.fastq.gz | samtools sort -o /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1055_S13.bam && samtools index -@ 36 /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1055_S13.bam
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1055_S13.bam.bai.
+[Mon May  9 06:54:13 2022]
+Finished job 114.
+12 of 188 steps (6%) done
+Select jobs to execute...
+
+[Mon May  9 06:54:13 2022]
+rule bwa_map_pe:
+    input: /mnt/AchTeraD/Documents/references/hg19/hg19.fa, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1018_S13_R1.fastq.gz, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1018_S13_R2.fastq.gz
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1018_S13.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1018_S13.bam.bai
+    jobid: 112
+    wildcards: sample=P18754_1018_S13
+    threads: 36
+
+bwa mem -M -t 36 -R '@RG\tID:P18754_1018_S13\tSM:P18754_1018_S13\tPL:ILLUMINA' /mnt/AchTeraD/Documents/references/hg19/hg19.fa /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1018_S13_R1.fastq.gz /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1018_S13_R2.fastq.gz | samtools sort -o /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1018_S13.bam && samtools index -@ 36 /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1018_S13.bam
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1018_S13.bam.bai.
+[Mon May  9 10:34:20 2022]
+Finished job 112.
+13 of 188 steps (7%) done
+Select jobs to execute...
+
+[Mon May  9 10:34:20 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1018_S13.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1018_S13.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1018_S13.metrics.txt
+    jobid: 111
+    wildcards: sample=P18754_1018_S13
+    threads: 4
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1018_S13.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1018_S13.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1018_S13.metrics.txt
+
+[Mon May  9 10:34:20 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1055_S13.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1055_S13.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1055_S13.metrics.txt
+    jobid: 113
+    wildcards: sample=P18754_1055_S13
+    threads: 4
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1055_S13.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1055_S13.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1055_S13.metrics.txt
+
+[Mon May  9 10:34:20 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1032_S28.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1032_S28.dedup.tsv.gz
+    jobid: 140
+    wildcards: sample=P18754_1032_S28
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1032_S28.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1032_S28.dedup.bam
+[Mon May  9 10:34:20 2022]
+Error in rule aflred_post:
+    jobid: 140
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1032_S28.dedup.tsv.gz
+    shell:
+        /home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1032_S28.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1032_S28.dedup.bam
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Job failed, going on with independent jobs.
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver.
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1018_S13.dedup.bam.
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1018_S13.bam.
+[Mon May  9 11:51:05 2022]
+Finished job 111.
+14 of 188 steps (7%) done
+Select jobs to execute...
+
+[Mon May  9 11:51:05 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1018_S13.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1018_S13.dedup.tsv.gz
+    jobid: 181
+    wildcards: sample=P18754_1018_S13
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1018_S13.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1018_S13.dedup.bam
+[Mon May  9 11:51:05 2022]
+Error in rule aflred_post:
+    jobid: 181
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1018_S13.dedup.tsv.gz
+    shell:
+        /home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1018_S13.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1018_S13.dedup.bam
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Job failed, going on with independent jobs.
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver.
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1055_S13.dedup.bam.
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1055_S13.bam.
+[Mon May  9 12:27:41 2022]
+Finished job 113.
+15 of 188 steps (8%) done
+Select jobs to execute...
+
+[Mon May  9 12:27:41 2022]
+rule bwa_map_pe:
+    input: /mnt/AchTeraD/Documents/references/hg19/hg19.fa, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1019_S18_R1.fastq.gz, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1019_S18_R2.fastq.gz
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1019_S18.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1019_S18.bam.bai
+    jobid: 26
+    wildcards: sample=P18754_1019_S18
+    threads: 36
+
+bwa mem -M -t 36 -R '@RG\tID:P18754_1019_S18\tSM:P18754_1019_S18\tPL:ILLUMINA' /mnt/AchTeraD/Documents/references/hg19/hg19.fa /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1019_S18_R1.fastq.gz /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1019_S18_R2.fastq.gz | samtools sort -o /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1019_S18.bam && samtools index -@ 36 /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1019_S18.bam
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1019_S18.bam.bai.
+[Mon May  9 16:37:26 2022]
+Finished job 26.
+16 of 188 steps (9%) done
+Select jobs to execute...
+
+[Mon May  9 16:37:26 2022]
+rule bwa_map_pe:
+    input: /mnt/AchTeraD/Documents/references/hg19/hg19.fa, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1009_S9_R1.fastq.gz, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1009_S9_R2.fastq.gz
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam.bai
+    jobid: 84
+    wildcards: sample=P18754_1009_S9
+    threads: 36
+
+bwa mem -M -t 36 -R '@RG\tID:P18754_1009_S9\tSM:P18754_1009_S9\tPL:ILLUMINA' /mnt/AchTeraD/Documents/references/hg19/hg19.fa /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1009_S9_R1.fastq.gz /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1009_S9_R2.fastq.gz | samtools sort -o /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam && samtools index -@ 36 /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam
+[Wed May 11 01:30:37 2022]
+Error in rule bwa_map_pe:
+    jobid: 84
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam.bai
+    shell:
+        bwa mem -M -t 36 -R '@RG\tID:P18754_1009_S9\tSM:P18754_1009_S9\tPL:ILLUMINA' /mnt/AchTeraD/Documents/references/hg19/hg19.fa /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1009_S9_R1.fastq.gz /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1009_S9_R2.fastq.gz | samtools sort -o /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam && samtools index -@ 36 /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Job failed, going on with independent jobs.
+Select jobs to execute...
+
+[Wed May 11 01:30:37 2022]
+rule bwa_map_pe:
+    input: /mnt/AchTeraD/Documents/references/hg19/hg19.fa, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1037_S33_R1.fastq.gz, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1037_S33_R2.fastq.gz
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1037_S33.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1037_S33.bam.bai
+    jobid: 34
+    wildcards: sample=P18754_1037_S33
+    threads: 36
+
+bwa mem -M -t 36 -R '@RG\tID:P18754_1037_S33\tSM:P18754_1037_S33\tPL:ILLUMINA' /mnt/AchTeraD/Documents/references/hg19/hg19.fa /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1037_S33_R1.fastq.gz /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1037_S33_R2.fastq.gz | samtools sort -o /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1037_S33.bam && samtools index -@ 36 /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1037_S33.bam
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1037_S33.bam.bai.
+[Wed May 11 09:52:16 2022]
+Finished job 34.
+17 of 188 steps (9%) done
+Select jobs to execute...
+
+[Wed May 11 09:52:16 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1019_S18.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1019_S18.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1019_S18.metrics.txt
+    jobid: 25
+    wildcards: sample=P18754_1019_S18
+    threads: 4
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1019_S18.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1019_S18.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1019_S18.metrics.txt
+
+[Wed May 11 09:52:16 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1037_S33.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1037_S33.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1037_S33.metrics.txt
+    jobid: 33
+    wildcards: sample=P18754_1037_S33
+    threads: 4
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1037_S33.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1037_S33.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1037_S33.metrics.txt
+
+[Wed May 11 09:52:16 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1055_S13.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1055_S13.dedup.tsv.gz
+    jobid: 182
+    wildcards: sample=P18754_1055_S13
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1055_S13.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1055_S13.dedup.bam
+[Wed May 11 09:52:16 2022]
+Error in rule aflred_post:
+    jobid: 182
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1055_S13.dedup.tsv.gz
+    shell:
+        /home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1055_S13.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1055_S13.dedup.bam
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Job failed, going on with independent jobs.
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver.
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1019_S18.dedup.bam.
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1019_S18.bam.
+[Wed May 11 11:30:11 2022]
+Finished job 25.
+18 of 188 steps (10%) done
+Select jobs to execute...
+
+[Wed May 11 11:30:11 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1019_S18.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1019_S18.dedup.tsv.gz
+    jobid: 138
+    wildcards: sample=P18754_1019_S18
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1019_S18.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1019_S18.dedup.bam
+[Wed May 11 11:30:11 2022]
+Error in rule aflred_post:
+    jobid: 138
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1019_S18.dedup.tsv.gz
+    shell:
+        /home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1019_S18.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1019_S18.dedup.bam
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Job failed, going on with independent jobs.
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver.
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1037_S33.dedup.bam.
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1037_S33.bam.
+[Wed May 11 12:23:05 2022]
+Finished job 33.
+19 of 188 steps (10%) done
+Select jobs to execute...
+
+[Wed May 11 12:23:06 2022]
+rule bwa_map_pe:
+    input: /mnt/AchTeraD/Documents/references/hg19/hg19.fa, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1051_S9_R1.fastq.gz, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1051_S9_R2.fastq.gz
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1051_S9.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1051_S9.bam.bai
+    jobid: 100
+    wildcards: sample=P18754_1051_S9
+    threads: 36
+
+bwa mem -M -t 36 -R '@RG\tID:P18754_1051_S9\tSM:P18754_1051_S9\tPL:ILLUMINA' /mnt/AchTeraD/Documents/references/hg19/hg19.fa /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1051_S9_R1.fastq.gz /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1051_S9_R2.fastq.gz | samtools sort -o /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1051_S9.bam && samtools index -@ 36 /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1051_S9.bam
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1051_S9.bam.bai.
+[Wed May 11 16:04:09 2022]
+Finished job 100.
+20 of 188 steps (11%) done
+Select jobs to execute...
+
+[Wed May 11 16:04:09 2022]
+rule bwa_map_pe:
+    input: /mnt/AchTeraD/Documents/references/hg19/hg19.fa, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1048_S6_R1.fastq.gz, /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1048_S6_R2.fastq.gz
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1048_S6.bam, /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1048_S6.bam.bai
+    jobid: 48
+    wildcards: sample=P18754_1048_S6
+    threads: 36
+
+bwa mem -M -t 36 -R '@RG\tID:P18754_1048_S6\tSM:P18754_1048_S6\tPL:ILLUMINA' /mnt/AchTeraD/Documents/references/hg19/hg19.fa /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1048_S6_R1.fastq.gz /mnt/sequencing/Lungcancer/deep_wgs/fastq/P18754_1048_S6_R2.fastq.gz | samtools sort -o /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1048_S6.bam && samtools index -@ 36 /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1048_S6.bam
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1048_S6.bam.bai.
+[Thu May 12 08:10:13 2022]
+Finished job 48.
+21 of 188 steps (11%) done
+Select jobs to execute...
+
+[Thu May 12 08:10:13 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1048_S6.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1048_S6.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1048_S6.metrics.txt
+    jobid: 47
+    wildcards: sample=P18754_1048_S6
+    threads: 4
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1048_S6.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1048_S6.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1048_S6.metrics.txt
+
+[Thu May 12 08:10:13 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1051_S9.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1051_S9.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1051_S9.metrics.txt
+    jobid: 99
+    wildcards: sample=P18754_1051_S9
+    threads: 4
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1051_S9.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1051_S9.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1051_S9.metrics.txt
+
+[Thu May 12 08:10:13 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1037_S33.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1037_S33.dedup.tsv.gz
+    jobid: 142
+    wildcards: sample=P18754_1037_S33
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1037_S33.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1037_S33.dedup.bam
+[Thu May 12 08:10:14 2022]
+Error in rule aflred_post:
+    jobid: 142
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1037_S33.dedup.tsv.gz
+    shell:
+        /home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1037_S33.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1037_S33.dedup.bam
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Job failed, going on with independent jobs.
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver.
+Write-protecting output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1051_S9.dedup.bam.
+Removing temporary output file /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1051_S9.bam.
+[Thu May 12 09:26:21 2022]
+Finished job 99.
+22 of 188 steps (12%) done
+Select jobs to execute...
+
+[Thu May 12 09:26:21 2022]
+rule aflred_post:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1051_S9.dedup.bam, /mnt/AchTeraD/Documents/references/hg19/hg19.fa
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1051_S9.dedup.tsv.gz
+    jobid: 175
+    wildcards: sample=P18754_1051_S9
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1051_S9.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1051_S9.dedup.bam
+[Thu May 12 09:26:21 2022]
+Error in rule aflred_post:
+    jobid: 175
+    output: /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1051_S9.dedup.tsv.gz
+    shell:
+        /home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg19/hg19.fa -o /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1051_S9.dedup.tsv.gz /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1051_S9.dedup.bam
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Job failed, going on with independent jobs.
+Select jobs to execute...
+Failed to solve scheduling problem with ILP solver. Falling back to greedy solver.

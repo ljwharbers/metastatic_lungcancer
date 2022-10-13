@@ -1,0 +1,56 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 38
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	2	aflred_post
+	1	all
+	2	deduplication
+	1	qc
+	6
+Select jobs to execute...
+
+[Mon Jul 18 10:19:01 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1015_S12.metrics.txt
+    jobid: 41
+    wildcards: sample=P18754_1015_S12
+    threads: 6
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1015_S12.metrics.txt
+
+[Mon Jul 18 10:19:01 2022]
+rule deduplication:
+    input: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1009_S9.metrics.txt
+    jobid: 35
+    wildcards: sample=P18754_1009_S9
+    threads: 6
+
+gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1009_S9.metrics.txt
+[Mon Jul 18 21:37:09 2022]
+Error in rule deduplication:
+    jobid: 35
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1009_S9.metrics.txt
+    shell:
+        gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1009_S9.metrics.txt
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Removing output files of failed job deduplication since they might be corrupted:
+/mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1009_S9.dedup.bam
+[Mon Jul 18 21:37:09 2022]
+Error in rule deduplication:
+    jobid: 41
+    output: /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.dedup.bam, /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1015_S12.metrics.txt
+    shell:
+        gatk MarkDuplicates -I /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.bam -O /mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.dedup.bam -M /mnt/sequencing/Lungcancer/deep_wgs/stats/P18754_1015_S12.metrics.txt
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Job failed, going on with independent jobs.
+Removing output files of failed job deduplication since they might be corrupted:
+/mnt/sequencing/Lungcancer/deep_wgs/bamfiles/P18754_1015_S12.dedup.bam
+Job failed, going on with independent jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: /mnt/AchTeraD/Documents/Projects/LungCancer/manuscript/repository/preprocessing/WGS_WES/.snakemake/log/2022-07-18T101901.624545.snakemake.log

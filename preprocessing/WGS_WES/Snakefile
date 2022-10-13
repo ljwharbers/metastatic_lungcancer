@@ -13,7 +13,7 @@ rule all:
     input:
         expand(config['outdir'] + "bamfiles/{sample}.dedup.bam",
             sample = samples),
-        config['outdir'] + "stats.tsv"
+        config['outdir'] + "stats/stats.tsv"
 
 # Map fastq
 if config['method'] == "se":
@@ -27,6 +27,7 @@ if config['method'] == "se":
         params:
             rg=r"@RG\tID:{sample}\tSM:{sample}\tPL:ILLUMINA"
         threads: config['threads']
+        priority: 1
         shell:
             "bwa mem -M -t {threads} -R '{params.rg}' {input} | "
             "samtools sort -o {output.bam} && samtools index -@ {threads} {output.bam}"
@@ -43,6 +44,7 @@ elif config['method'] == "pe":
         params:
             rg=r"@RG\tID:{sample}\tSM:{sample}\tPL:ILLUMINA"
         threads: config['threads']
+        priority: 1
         shell:
             "bwa mem -M -t {threads} -R '{params.rg}' {input} | "
             "samtools sort -o {output.bam} && samtools index -@ {threads} {output.bam}"
@@ -57,7 +59,7 @@ rule deduplication:
     output:
         bam=protected(config['outdir'] + "bamfiles/{sample}.dedup.bam"),
         metrics=config['outdir'] + "stats/{sample}.metrics.txt"
-    threads: 4
+    threads: 6
     shell:
         "gatk MarkDuplicates -I {input.bam} -O {output.bam} "
         "-M {output.metrics}"
@@ -79,7 +81,7 @@ rule qc:
         expand(config['outdir'] + "stats/{sample}.dedup.tsv.gz",
             sample = samples)
     output:
-        config['outdir'] + "stats.tsv"
+        config['outdir'] + "stats/stats.tsv"
     params:
         dir=config['outdir'] + 'stats/'
     shell:

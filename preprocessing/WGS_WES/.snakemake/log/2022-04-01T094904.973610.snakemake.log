@@ -1,0 +1,94 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 40
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	5	aflred_post
+	1	all
+	1	qc
+	7
+Select jobs to execute...
+
+[Fri Apr  1 09:49:05 2022]
+rule aflred_post:
+    input: /mnt/sequencing/BICRO320/bamfiles/S1_NES_400ng.dedup.bam, /mnt/AchTeraD/Documents/references/hg38/hg38.fa
+    output: /mnt/sequencing/BICRO320/stats/S1_NES_400ng.dedup.tsv.gz
+    jobid: 14
+    wildcards: sample=S1_NES_400ng
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg38/hg38.fa -o /mnt/sequencing/BICRO320/stats/S1_NES_400ng.dedup.tsv.gz /mnt/sequencing/BICRO320/bamfiles/S1_NES_400ng.dedup.bam
+
+[Fri Apr  1 09:49:05 2022]
+rule aflred_post:
+    input: /mnt/sequencing/BICRO320/bamfiles/S2_NES_400ng.dedup.bam, /mnt/AchTeraD/Documents/references/hg38/hg38.fa
+    output: /mnt/sequencing/BICRO320/stats/S2_NES_400ng.dedup.tsv.gz
+    jobid: 16
+    wildcards: sample=S2_NES_400ng
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg38/hg38.fa -o /mnt/sequencing/BICRO320/stats/S2_NES_400ng.dedup.tsv.gz /mnt/sequencing/BICRO320/bamfiles/S2_NES_400ng.dedup.bam
+
+[Fri Apr  1 09:49:05 2022]
+rule aflred_post:
+    input: /mnt/sequencing/BICRO320/bamfiles/S3_NES_400ng.dedup.bam, /mnt/AchTeraD/Documents/references/hg38/hg38.fa
+    output: /mnt/sequencing/BICRO320/stats/S3_NES_400ng.dedup.tsv.gz
+    jobid: 12
+    wildcards: sample=S3_NES_400ng
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg38/hg38.fa -o /mnt/sequencing/BICRO320/stats/S3_NES_400ng.dedup.tsv.gz /mnt/sequencing/BICRO320/bamfiles/S3_NES_400ng.dedup.bam
+
+[Fri Apr  1 09:49:05 2022]
+rule aflred_post:
+    input: /mnt/sequencing/BICRO320/bamfiles/S4_NES_400ng.dedup.bam, /mnt/AchTeraD/Documents/references/hg38/hg38.fa
+    output: /mnt/sequencing/BICRO320/stats/S4_NES_400ng.dedup.tsv.gz
+    jobid: 15
+    wildcards: sample=S4_NES_400ng
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg38/hg38.fa -o /mnt/sequencing/BICRO320/stats/S4_NES_400ng.dedup.tsv.gz /mnt/sequencing/BICRO320/bamfiles/S4_NES_400ng.dedup.bam
+
+[Fri Apr  1 09:49:05 2022]
+rule aflred_post:
+    input: /mnt/sequencing/BICRO320/bamfiles/S7_NEU_200ng.dedup.bam, /mnt/AchTeraD/Documents/references/hg38/hg38.fa
+    output: /mnt/sequencing/BICRO320/stats/S7_NEU_200ng.dedup.tsv.gz
+    jobid: 13
+    wildcards: sample=S7_NEU_200ng
+
+/home/luukharbers/alfred/bin/alfred qc -r /mnt/AchTeraD/Documents/references/hg38/hg38.fa -o /mnt/sequencing/BICRO320/stats/S7_NEU_200ng.dedup.tsv.gz /mnt/sequencing/BICRO320/bamfiles/S7_NEU_200ng.dedup.bam
+[Fri Apr  1 09:58:43 2022]
+Finished job 13.
+1 of 7 steps (14%) done
+[Fri Apr  1 09:59:00 2022]
+Finished job 15.
+2 of 7 steps (29%) done
+[Fri Apr  1 09:59:20 2022]
+Finished job 14.
+3 of 7 steps (43%) done
+[Fri Apr  1 09:59:24 2022]
+Finished job 12.
+4 of 7 steps (57%) done
+[Fri Apr  1 09:59:31 2022]
+Finished job 16.
+5 of 7 steps (71%) done
+Select jobs to execute...
+
+[Fri Apr  1 09:59:31 2022]
+rule qc:
+    input: /mnt/sequencing/BICRO320/stats/S3_NES_400ng.dedup.tsv.gz, /mnt/sequencing/BICRO320/stats/S7_NEU_200ng.dedup.tsv.gz, /mnt/sequencing/BICRO320/stats/S1_NES_400ng.dedup.tsv.gz, /mnt/sequencing/BICRO320/stats/S4_NES_400ng.dedup.tsv.gz, /mnt/sequencing/BICRO320/stats/S2_NES_400ng.dedup.tsv.gz
+    output: /mnt/sequencing/BICRO320/stats.tsv
+    jobid: 11
+
+
+        zgrep ^ME /mnt/sequencing/BICRO320/stats/*dedup.tsv.gz | cut -f 2- | \
+        sed -n '1p;0~2p' > /mnt/sequencing/BICRO320/stats/stats.tsv
+        
+Waiting at most 5 seconds for missing files.
+MissingOutputException in line 77 of /mnt/AchTeraD/Documents/Projects/LungCancer/manuscript/repository/preprocessing/WGS_WES/Snakefile:
+Job Missing files after 5 seconds:
+/mnt/sequencing/BICRO320/stats.tsv
+This might be due to filesystem latency. If that is the case, consider to increase the wait time with --latency-wait.
+Job id: 11 completed successfully, but some output files are missing. 11
+  File "/home/luukharbers/miniconda3/lib/python3.8/site-packages/snakemake/executors/__init__.py", line 575, in handle_job_success
+  File "/home/luukharbers/miniconda3/lib/python3.8/site-packages/snakemake/executors/__init__.py", line 247, in handle_job_success
+Job failed, going on with independent jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: /mnt/AchTeraD/Documents/Projects/LungCancer/manuscript/repository/preprocessing/WGS_WES/.snakemake/log/2022-04-01T094904.973610.snakemake.log

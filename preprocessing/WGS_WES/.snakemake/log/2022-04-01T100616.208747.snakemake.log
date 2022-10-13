@@ -1,0 +1,32 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 40
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	all
+	1	qc
+	2
+Select jobs to execute...
+
+[Fri Apr  1 10:06:16 2022]
+rule qc:
+    input: /mnt/sequencing/BICRO320/stats/S3_NES_400ng.dedup.tsv.gz, /mnt/sequencing/BICRO320/stats/S7_NEU_200ng.dedup.tsv.gz, /mnt/sequencing/BICRO320/stats/S1_NES_400ng.dedup.tsv.gz, /mnt/sequencing/BICRO320/stats/S4_NES_400ng.dedup.tsv.gz, /mnt/sequencing/BICRO320/stats/S2_NES_400ng.dedup.tsv.gz
+    output: /mnt/sequencing/BICRO320/stats.tsv
+    jobid: 11
+
+
+        zgrep ^ME /mnt/sequencing/BICRO320/stats/*dedup.tsv.gz | cut -f 2- | \
+        sed -n '1p;0~2p' > /mnt/sequencing/BICRO320/stats/stats.tsv
+        
+Waiting at most 5 seconds for missing files.
+MissingOutputException in line 77 of /mnt/AchTeraD/Documents/Projects/LungCancer/manuscript/repository/preprocessing/WGS_WES/Snakefile:
+Job Missing files after 5 seconds:
+/mnt/sequencing/BICRO320/stats.tsv
+This might be due to filesystem latency. If that is the case, consider to increase the wait time with --latency-wait.
+Job id: 11 completed successfully, but some output files are missing. 11
+  File "/home/luukharbers/miniconda3/lib/python3.8/site-packages/snakemake/executors/__init__.py", line 575, in handle_job_success
+  File "/home/luukharbers/miniconda3/lib/python3.8/site-packages/snakemake/executors/__init__.py", line 247, in handle_job_success
+Job failed, going on with independent jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: /mnt/AchTeraD/Documents/Projects/LungCancer/manuscript/repository/preprocessing/WGS_WES/.snakemake/log/2022-04-01T100616.208747.snakemake.log
